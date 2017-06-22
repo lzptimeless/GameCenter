@@ -18,6 +18,7 @@ namespace UIDesign.Controls
         Point _offset;
         Size _extentSize;
         Size _viewportSize;
+        Dictionary<UIElement, Size> _childDesiredSizeList = new Dictionary<UIElement, Size>();
         Dictionary<UIElement, Rect> _childLayoutList = new Dictionary<UIElement, Rect>();
         #endregion
 
@@ -65,7 +66,8 @@ namespace UIDesign.Controls
             var itemsOwner = ItemsControl.GetItemsOwner(this);
             if (itemsOwner != null)
             {
-
+                // 预测子项大小
+                
             }
             else
             {

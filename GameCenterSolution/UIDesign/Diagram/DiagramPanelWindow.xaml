@@ -5,8 +5,43 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UIDesign.Diagram"
         mc:Ignorable="d"
-        Title="DiagramPanelWindow" Height="400" Width="600">
+        Title="DiagramPanelWindow" Height="400" Width="700">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="100"/>
+        </Grid.ColumnDefinitions>
+        <Border Grid.Column="1" Background="Beige" Padding="10">
+            <WrapPanel>
+                <Button x:Name="SaveButton" Content="Save" Width="70" Click="SaveButton_Click"/>
+            </WrapPanel>
+        </Border>
+        <Border x:Name="DiagramBorder" Grid.Column="0" Background="White">
+            <Viewport3D>
+                <Viewport3D.Camera>
+                    <PerspectiveCamera Position="5,5,5" LookDirection="-1,-1,-1"
+                                       FieldOfView="45" NearPlaneDistance="1" FarPlaneDistance="2000"/>
+                    <!--<PerspectiveCamera Position="0, 0, 4"/>-->
+                </Viewport3D.Camera>
+                <ModelVisual3D>
+                    <ModelVisual3D.Content>
+                        <AmbientLight Color="White"/>
+                    </ModelVisual3D.Content>
+                </ModelVisual3D>
+                <Viewport2DVisual3D>
+                    <Viewport2DVisual3D.Material>
+                        <DiffuseMaterial Brush="White" Viewport2DVisual3D.IsVisualHostMaterial="True"/>
+                    </Viewport2DVisual3D.Material>
+                    <Viewport2DVisual3D.Geometry>
+                        <MeshGeometry3D Positions="-1,1,0 -1,-1,0 1,-1,0 1,1,0"
+                                        TextureCoordinates="0,0 0,1 1,1 1,0" 
+                                        TriangleIndices="0 1 2 0 2 3"/>
+                    </Viewport2DVisual3D.Geometry>
+                    <Border Background="Blue">
+                        <TextBlock Text="11" Foreground="White" />
+                    </Border>
+                </Viewport2DVisual3D>
+            </Viewport3D>
+        </Border>
     </Grid>
 </Window>
