@@ -18,7 +18,7 @@
             <Rectangle Fill="Beige" Width="100" Height="400"/>
             <Rectangle Fill="BlanchedAlmond" Width="220" Height="500"/>
             <Rectangle Fill="Coral" Width="300" Height="100"/>-->
-            
+
             <!--纵向布局测试数据-->
             <!--<Rectangle Fill="Green" Width="400" Height="200"/>
             <Rectangle Fill="Yellow" Width="450" Height="100"/>

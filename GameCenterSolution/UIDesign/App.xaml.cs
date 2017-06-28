@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameCenter.Core;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -13,5 +14,11 @@ namespace UIDesign
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            ModulesConfigSection modulesSection = ModulesConfigSection.GetConfig();
+        }
     }
 }
