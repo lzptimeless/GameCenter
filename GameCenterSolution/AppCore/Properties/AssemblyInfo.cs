@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("GameCenter.Core")]
+[assembly: AssemblyTitle("AppCore")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("GameCenter.Core")]
+[assembly: AssemblyProduct("AppCore")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("03efd162-cfde-4bff-b2aa-a6424fe9e4b5")]
+[assembly: Guid("f37740d6-a6d1-42b0-94cc-1b522076384a")]
 
 // Version information for an assembly consists of the following four values:
 //

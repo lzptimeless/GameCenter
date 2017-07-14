@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace GameCenter.Core
+namespace AppCore
 {
     public class ModulesConfigSection : ConfigurationSection
     {

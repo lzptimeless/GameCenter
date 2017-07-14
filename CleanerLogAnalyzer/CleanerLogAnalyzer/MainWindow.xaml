@@ -1,0 +1,41 @@
+﻿<Window x:Class="CleanerLogAnalyzer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CleanerLogAnalyzer"
+        mc:Ignorable="d"
+        Title="Cleaner log analyzer" Height="600" Width="900">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="CCleanerLogTextBox"/>
+                <Button Grid.Column="1" x:Name="SelectCCleanerLogButton" Content="CCleaner日志" Width="80" Margin="10,0,0,0"/>
+            </Grid>
+            <Grid Grid.Column="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="CortexLogTextBox"/>
+                <Button Grid.Column="1" x:Name="SelectCortexLogButton" Content="Cortex日志" Width="80" Margin="10,0,0,0"/>
+            </Grid>
+        </Grid>
+        <TextBlock Grid.Row="1" x:Name="SelectedItemDetailTextBlock" Margin="10" Text="选择一项来查看它的完整内容。"/>
+        <DataGrid Grid.Row="2"></DataGrid>
+    </Grid>
+</Window>

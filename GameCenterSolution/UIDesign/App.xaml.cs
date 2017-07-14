@@ -1,4 +1,4 @@
-﻿using GameCenter.Core;
+﻿using AppCore;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
