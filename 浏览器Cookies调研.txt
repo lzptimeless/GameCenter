@@ -1,0 +1,45 @@
+标题：浏览器Cookies调研
+作者：凌仲平
+创建时间：2017-8-3 16:23
+阅读时间：无
+修改时间：无
+修改历史：无
+
+正文：
+Edge
+
+版本：40.15063.0.0
+Cookies路径：<AppData>\Local\Packages\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\AC\#!002\MicrosoftEdge\Cookies下的*.txt和*.cookie
+文件格式：
+Cookie名\n
+Cookie值\n
+域名+路径\n
+未知\n
+创建时间\n
+未知\n
+过期时间\n
+未知\n
+*<结尾符>\n
+
+Internet Explorer
+
+版本：11.483.15063.0
+路径：
+C:\Users\Zhongping.Zhang\AppData\Local\Microsoft\Windows\INetCookies下的*.txt和*.cookie
+C:\Users\Zhongping.Zhang\AppData\Local\Microsoft\Windows\INetCache下的*.txt和*.cookie
+文件格式：
+与Edge相同
+
+Chrome
+
+版本：60.0.3112.78
+路径：C:\Users\Zhongping.Zhang\AppData\Local\Google\Chrome\User Data\Default\Cookies
+文件格式：
+Sqlite
+
+Firefox
+
+版本：54.0.1
+路径：C:\Users\Zhongping.Zhang\AppData\Roaming\Mozilla\Firefox\Profiles\vq3t5gmk.default\cookies.sqlite
+文件格式：
+Sqlite
