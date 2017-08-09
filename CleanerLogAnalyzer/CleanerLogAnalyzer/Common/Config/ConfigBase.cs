@@ -22,7 +22,7 @@ namespace AppCore
         #endregion
 
         #region public methods
-        
+
         #endregion
 
         #region private methods
@@ -70,6 +70,11 @@ namespace AppCore
             if (string.IsNullOrEmpty(configPath)) throw new InvalidOperationException("ConfigPath is empty.");
 
             ILogger logger = Application.Current.ToIApp().Logger;
+            if (!File.Exists(configPath))
+            {
+                logger.Warn($"Can not read config, file not exist: {configPath}");
+                return;
+            }
 
             string content;
             try

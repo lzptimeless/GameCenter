@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BrowserCookieManager
 {
-    public class EdgeCookiesStorage : ICookiesStorage
+    public class IECookiesStorage : ICookiesStorage
     {
         #region inner classes
         private struct IterateCookieFileOption
@@ -21,26 +21,6 @@ namespace BrowserCookieManager
 
             public bool Break { get; set; }
             public bool Delete { get; set; }
-        }
-
-        private struct IterateDirectoryOption
-        {
-            public IterateDirectoryOption(bool breakOp)
-            {
-                Break = breakOp;
-            }
-
-            public bool Break { get; set; }
-        }
-
-        private struct RecursiveOption
-        {
-            public RecursiveOption(bool breakOp)
-            {
-                Break = breakOp;
-            }
-
-            public bool Break { get; set; }
         }
         #endregion
 
@@ -189,9 +169,11 @@ namespace BrowserCookieManager
         private void IterateCookieFiles(Func<FileInfo, IterateCookieFileOption> taskFunc)
         {
             string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string packDirPath = Path.Combine(localAppData, "Packages");
-            IterateDirectories(new[] { packDirPath, "*Edge*", "AC", "#!*", "*Edge*", "*Cookie*" }, 0, null, dir =>
+            string dir1Path = Path.Combine(localAppData, "Microsoft\\Windows\\INetCookies");
+            string dir2Path = Path.Combine(localAppData, "Microsoft\\Windows\\INetCache");
+            foreach (var dirPath in new[] { dir1Path, dir2Path })
             {
+                var dir = new DirectoryInfo(dirPath);
                 List<FileInfo> deleteFiles = new List<FileInfo>();
                 bool breakOp = false;
                 try
@@ -228,43 +210,8 @@ namespace BrowserCookieManager
                 catch (UnauthorizedAccessException)
                 { }
 
-                return new IterateDirectoryOption(breakOp);
-            });// IterateDirectories
-        }
-
-        private RecursiveOption IterateDirectories(string[] dirNames, int index, DirectoryInfo parentDir, Func<DirectoryInfo, IterateDirectoryOption> dirTask)
-        {
-            if (dirNames == null || dirNames.Length == 0) throw new ArgumentException("Can not be empty.", "dirNames");
-            if (dirNames.Length - 1 < index) throw new ArgumentOutOfRangeException("index", index, $"Out of dirNames range[{0}..{dirNames.Length - 1}]");
-
-            if (parentDir == null) parentDir = new DirectoryInfo(dirNames[index]);
-            if (dirNames.Length - 1 == index)
-            {
-                dirTask(parentDir);
-                return new RecursiveOption(false);
-            }
-
-            try
-            {
-                bool needDoTask = dirNames.Length - 1 == index + 1;
-                foreach (var subDir in parentDir.EnumerateDirectories(dirNames[index + 1], SearchOption.TopDirectoryOnly))
-                {
-                    if (needDoTask)
-                    {
-                        if (dirTask(subDir).Break) return new RecursiveOption(true);
-                    }
-                    else
-                    {
-                        if (IterateDirectories(dirNames, index + 1, subDir, dirTask).Break) return new RecursiveOption(true);
-                    }
-                }
-            }
-            catch (SecurityException)
-            { }
-            catch (UnauthorizedAccessException)
-            { }
-
-            return new RecursiveOption(false);
+                if (breakOp) break;
+            }// foreach dirXPath
         }
         #endregion
     }

@@ -56,6 +56,13 @@ namespace AppCore
 
         #endregion
 
+        #region public
+        public void Save()
+        {
+            Save(_configPath);
+        }
+        #endregion
+
         #region private
         protected override bool TrySerializeProperty(string propertyName, object value, out string text)
         {

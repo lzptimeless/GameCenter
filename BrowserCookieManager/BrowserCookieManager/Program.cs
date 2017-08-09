@@ -10,6 +10,25 @@ namespace BrowserCookieManager
     {
         static void Main(string[] args)
         {
+            ICookiesStorage cs = new FireFoxCookiesStorage();
+            var cookies = cs.GetByDomain("baidu.com");
+
+            foreach (var item in cookies)
+            {
+                Console.WriteLine(item);
+            }
+            //Console.ReadKey();
+
+            //cs.DeleteByDomain("jd.com");
+            //Console.WriteLine("Deleted jd.com");
+
+            //cookies = cs.GetByDomain("baidu.com");
+            //foreach (var item in cookies)
+            //{
+            //    Console.WriteLine(item);
+            //}
+
+            Console.ReadKey();
         }
     }
 }

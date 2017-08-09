@@ -4,38 +4,268 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CleanerLogAnalyzer"
+        xmlns:md="clr-namespace:CleanerLogAnalyzer.Models"
+        xmlns:ctl="clr-namespace:CleanerLogAnalyzer.Controls"
         mc:Ignorable="d"
-        Title="Cleaner log analyzer" Height="600" Width="900">
+        Title="Cleaner log analyzer" Height="600" Width="900"
+        Loaded="Window_Loaded"
+        Icon="/Images/AppIcon.png">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="60"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Grid Margin="10">
+        <Grid Margin="10" Height="25">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition Width="20"/>
                 <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBox x:Name="CCleanerLogTextBox"/>
-                <Button Grid.Column="1" x:Name="SelectCCleanerLogButton" Content="CCleaner日志" Width="80" Margin="10,0,0,0"/>
+                <TextBox x:Name="CCleanerLogTextBox" VerticalContentAlignment="Center" Padding="5,0"/>
+                <Button Grid.Column="1" x:Name="SelectCCleanerLogButton" Content="CCleaner日志" Width="80" Margin="10,0,0,0"
+                        Click="SelectCCleanerLogButton_Click"/>
             </Grid>
             <Grid Grid.Column="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBox x:Name="CortexLogTextBox"/>
-                <Button Grid.Column="1" x:Name="SelectCortexLogButton" Content="Cortex日志" Width="80" Margin="10,0,0,0"/>
+                <TextBox x:Name="CortexLogTextBox" VerticalContentAlignment="Center" Padding="5,0"/>
+                <Button Grid.Column="1" x:Name="SelectCortexLogButton" Content="Cortex日志" Width="80" Margin="10,0,0,0"
+                        Click="SelectCortexLogButton_Click"/>
             </Grid>
+            <Button x:Name="AnalyzeButton" Grid.Column="3" HorizontalAlignment="Center" Width="80" Margin="20,0,0,0" Content="分析"
+                    Click="AnalyzeButton_Click"/>
         </Grid>
-        <TextBlock Grid.Row="1" x:Name="SelectedItemDetailTextBlock" Margin="10" Text="选择一项来查看它的完整内容。"/>
-        <DataGrid Grid.Row="2"></DataGrid>
+        <Border Grid.Row="1" Background="#eeeeee">
+            <TextBox x:Name="SelectedItemDetailTextBox" TextWrapping="Wrap" Text="选择一项来查看它的完整内容。"
+                     IsReadOnly="True"/>
+        </Border>
+        <Grid Grid.Row="2">
+            <StackPanel Margin="10" Orientation="Horizontal" HorizontalAlignment="Left">
+                <CheckBox x:Name="HideSameItemCheckBox" Content="隐藏相同的项"
+                          Checked="HideSameItemCheckBox_Checked" Unchecked="HideSameItemCheckBox_Unchecked"/>
+                <CheckBox x:Name="HideCCleanerCheckBox" Content="隐藏CCleaner的项" Margin="10,0,0,0"
+                          Checked="HideCCleanerCheckBox_Checked" Unchecked="HideCCleanerCheckBox_Unchecked"/>
+                <CheckBox x:Name="HideCortexCheckBox" Content="隐藏Cortex的项" Margin="10,0,0,0"
+                          Checked="HideCortexCheckBox_Checked" Unchecked="HideCortexCheckBox_Unchecked"/>
+            </StackPanel>
+            <Button x:Name="ExportButton" HorizontalAlignment="Right" Height="25" Width="80" Margin="0,0,10,0"
+                    Content="导出XLSX"
+                    Click="ExportButton_Click"/>
+        </Grid>
+        <DataGrid Grid.Row="3" x:Name="ItemsDataGrid" AutoGenerateColumns="False" 
+                  AlternationCount="2" RowBackground="White" AlternatingRowBackground="#EEEEEE"
+                  GridLinesVisibility="Vertical" VerticalGridLinesBrush="#D1D1D1"
+                  SelectionUnit="Cell"
+                  Background="Transparent"
+                  SelectedCellsChanged="ItemsDataGrid_SelectedCellsChanged">
+            <DataGrid.Template>
+                <ControlTemplate TargetType="DataGrid">
+                    <Border x:Name="border"
+                            SnapsToDevicePixels="True"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}">
+                        <ScrollViewer x:Name="DG_ScrollViewer"
+                                      Focusable="false"
+                                      Background="Black">
+                            <ScrollViewer.Template>
+                                <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <Button Focusable="false"
+                                                Command="{x:Static DataGrid.SelectAllCommand}"
+                                                Style="{DynamicResource {ComponentResourceKey ResourceId=DataGridSelectAllButtonStyle, TypeInTargetAssembly={x:Type DataGrid}}}"
+                                                Visibility="{Binding HeadersVisibility, ConverterParameter={x:Static DataGridHeadersVisibility.All}, Converter={x:Static DataGrid.HeadersVisibilityConverter}, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"
+                                                Width="{Binding CellsPanelHorizontalOffset, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+
+                                        <DataGridColumnHeadersPresenter x:Name="PART_ColumnHeadersPresenter"
+                                                                        Grid.Column="1"
+                                                                        Visibility="{Binding HeadersVisibility, ConverterParameter={x:Static DataGridHeadersVisibility.Column}, Converter={x:Static DataGrid.HeadersVisibilityConverter}, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+
+                                        <ScrollContentPresenter x:Name="PART_ScrollContentPresenter"
+                                                                Grid.ColumnSpan="2"
+                                                                Grid.Row="1"
+                                                                CanContentScroll="{TemplateBinding CanContentScroll}" />
+
+                                        <ctl:DiffThumbView Grid.Row="1" Grid.Column="3" LogItems="{Binding ItemsSource, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"
+                                                           Margin="0,17" Width="15"/>
+                                        <ScrollBar x:Name="PART_VerticalScrollBar"
+                                                   Grid.Column="2"
+                                                   Grid.Row="1"
+                                                   Orientation="Vertical"
+                                                   ViewportSize="{TemplateBinding ViewportHeight}"
+                                                   Maximum="{TemplateBinding ScrollableHeight}"
+                                                   Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                                                   Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"/>
+
+                                        <Grid Grid.Column="1" Grid.Row="2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="{Binding NonFrozenColumnsViewportHorizontalOffset, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <ScrollBar x:Name="PART_HorizontalScrollBar"
+                                                       Grid.Column="1"
+                                                       Orientation="Horizontal"
+                                                       ViewportSize="{TemplateBinding ViewportWidth}"
+                                                       Maximum="{TemplateBinding ScrollableWidth}"
+                                                       Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
+                                                       Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        </Grid>
+                                    </Grid>
+                                </ControlTemplate>
+                            </ScrollViewer.Template>
+                            <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </DataGrid.Template>
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="DataGridRow">
+                                <SelectiveScrollingGrid x:Name="DGR_Grid" Background="{TemplateBinding Background}">
+                                    <SelectiveScrollingGrid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </SelectiveScrollingGrid.ColumnDefinitions>
+                                    <SelectiveScrollingGrid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </SelectiveScrollingGrid.RowDefinitions>
+                                    <DataGridCellsPresenter Grid.Column="1"
+                                                            ItemsPanel="{TemplateBinding ItemsPanel}"
+                                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                    <DataGridDetailsPresenter Grid.Column="1"
+                                                              Grid.Row="1"
+                                                              Visibility="{TemplateBinding DetailsVisibility}"
+                                                              SelectiveScrollingGrid.SelectiveScrollingOrientation=
+                                                              "{Binding AreRowDetailsFrozen, 
+                                                              ConverterParameter={x:Static SelectiveScrollingOrientation.Vertical},
+                                                              Converter={x:Static DataGrid.RowDetailsScrollingConverter}, 
+                                                              RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"/>
+                                    <DataGridRowHeader Grid.RowSpan="2"
+                                                       SelectiveScrollingGrid.SelectiveScrollingOrientation="Vertical"
+                                                       Visibility="{Binding HeadersVisibility, 
+                                                       ConverterParameter={x:Static DataGridHeadersVisibility.Row}, 
+                                                       Converter={x:Static DataGrid.HeadersVisibilityConverter}, 
+                                                       RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                                </SelectiveScrollingGrid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="DataGridCell">
+                                <Border x:Name="CellBorder" BorderBrush="Transparent" Background="Transparent">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup x:Name="FocusStates">
+                                            <VisualState x:Name="Unfocused" />
+                                            <VisualState x:Name="Focused" />
+                                        </VisualStateGroup>
+                                        <VisualStateGroup x:Name="CurrentStates">
+                                            <VisualState x:Name="Regular" />
+                                            <VisualState x:Name="Current">
+                                                <Storyboard>
+                                                    <ColorAnimationUsingKeyFrames Storyboard.TargetName="CellBorder" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)">
+                                                        <DiscreteColorKeyFrame KeyTime="0" Value="#BDC8FF" />
+                                                    </ColorAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                        <VisualStateGroup x:Name="SelectionStates">
+                                            <VisualState x:Name="Unselected" />
+                                            <VisualState x:Name="Selected">
+                                                <Storyboard>
+                                                    <ColorAnimationUsingKeyFrames Storyboard.TargetName="CellBorder" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)">
+                                                        <DiscreteColorKeyFrame KeyTime="0" Value="#BBCCFF" />
+                                                    </ColorAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
+                                    <ContentPresenter/>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </DataGrid.CellStyle>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn x:Name="CCleanerColumn" Width="5*" ClipboardContentBinding="{Binding CCleanerContent}">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="CCleaner日志项"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="md:CleanerLogItem">
+                            <TextBlock x:Name="ContentTextBlock" Text="{Binding CCleanerContent, Mode=OneWay}"
+                                       Foreground="#808080"/>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding CortexContains, Mode=OneWay}" Value="False">
+                                    <Setter TargetName="ContentTextBlock" Property="Foreground" Value="Red"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn x:Name="CortexColumn" Width="5*" ClipboardContentBinding="{Binding CortexContent}">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="Cortex日志项"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="md:CleanerLogItem">
+                            <TextBlock x:Name="ContentTextBlock" Text="{Binding CortexContent, Mode=OneWay}"
+                                       Foreground="#808080"/>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding CCleanerContains, Mode=OneWay}" Value="False">
+                                    <Setter TargetName="ContentTextBlock" Property="Foreground" Value="Green"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Border x:Name="ProgressHost" Grid.RowSpan="4" VerticalAlignment="Center" Height="80" Width="450"
+                Background="#EEEEEE" BorderThickness="1" BorderBrush="#DDDDDD" Visibility="Collapsed">
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock x:Name="ProgressTitle" Text="Analyzing..." TextAlignment="Center" Margin="0,0,0,5"/>
+                <ProgressBar x:Name="ProgressAnimation" IsIndeterminate="False" Height="5" HorizontalAlignment="Center"
+                             Width="200"/>
+                <TextBlock Grid.Row="1" x:Name="ProgressTextBlock" Margin="5,5,5,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
+                           TextAlignment="Center"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>
