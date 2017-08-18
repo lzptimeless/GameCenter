@@ -33,6 +33,10 @@ namespace CleanerLogAnalyzer.Models
         {
             get { return CortexContains ? Content : string.Empty; }
         }
+
+        public int CCleanerRepeatCount { get; set; }
+
+        public int CortexRepeatCount { get; set; }
         #endregion
     }
 }

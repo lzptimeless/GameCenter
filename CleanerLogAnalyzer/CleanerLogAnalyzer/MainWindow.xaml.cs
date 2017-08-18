@@ -136,6 +136,11 @@ namespace CleanerLogAnalyzer
             bool isHideSameItems = HideSameItemCheckBox.IsChecked == true;
             bool isHideCCleaner = HideCCleanerCheckBox.IsChecked == true;
             bool isHideCortex = HideCortexCheckBox.IsChecked == true;
+            bool onlyShowRepeat = OnlyShowRepeatCheckBox.IsChecked == true;
+            bool sortReverseByRepeat = SortReverseByRepeatCheckBox.IsChecked == true;
+            bool customHideEabled = CustomHideCheckBox.IsChecked == true;
+            var customHideExtensions = AppConfig.Default.CustomHideFileExtensions.Select(p => '.' + p);
+
             if (_originalItems != null)
             {
                 foreach (var item in _originalItems)
@@ -143,8 +148,19 @@ namespace CleanerLogAnalyzer
                     if (isHideSameItems && item.CortexContains && item.CCleanerContains) continue;
                     if (isHideCCleaner && (item.Parents & ~CleanerLogItemParents.CCleaner) == 0) continue;
                     if (isHideCortex && (item.Parents & ~CleanerLogItemParents.Cortex) == 0) continue;
+                    if (onlyShowRepeat && item.CortexRepeatCount == 0) continue;
+                    if (customHideEabled)
+                    {
+                        var extension = System.IO.Path.GetExtension((item.Content ?? string.Empty).Trim());
+                        if (customHideExtensions.Any(p => string.Equals(extension, p, StringComparison.OrdinalIgnoreCase))) continue;
+                    }
 
                     realItems.Add(item);
+                }
+
+                if (sortReverseByRepeat)
+                {
+                    realItems.Sort((l, r) => r.CortexRepeatCount.CompareTo(l.CortexRepeatCount));
                 }
             }
 
@@ -180,13 +196,18 @@ namespace CleanerLogAnalyzer
             items.AddRange(cortexItems);
             items.Sort((l, r) => string.Compare(l.Content, r.Content, true));
 
-            ShowProgressMessage("为日志项设置属性和移除重复的日志项..");
+            ShowProgressMessage("为日志项设置标记和检测重复..");
             CleanerLogItem preItem = null;
             for (int i = 0; i < items.Count; i++)
             {
                 if (preItem == null) preItem = items[i];
                 else if (string.Equals(preItem.Content, items[i].Content, StringComparison.OrdinalIgnoreCase))
                 {
+                    // 计数这条数据在Cortex中的重复次数
+                    if (preItem.CortexContains && items[i].CortexContains) preItem.CortexRepeatCount++;
+                    // 计数这条数据在CCleaner中的重复次数
+                    if (preItem.CCleanerContains && items[i].CCleanerContains) preItem.CCleanerRepeatCount++;
+
                     preItem.Parents = preItem.Parents | items[i].Parents;
                     items.RemoveAt(i);
                     --i;
@@ -284,6 +305,48 @@ namespace CleanerLogAnalyzer
             UpdateDataGridItems();
         }
 
+        private void OnlyShowRepeatCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            UpdateDataGridItems();
+        }
+
+        private void OnlyShowRepeatCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            UpdateDataGridItems();
+        }
+
+        private void SortReverseByRepeatCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            UpdateDataGridItems();
+        }
+
+        private void SortReverseByRepeatCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            UpdateDataGridItems();
+        }
+
+        private void CustomHideCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            UpdateDataGridItems();
+        }
+
+        private void CustomHideCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            UpdateDataGridItems();
+        }
+
+        private void CustomHideButton_Click(object sender, RoutedEventArgs e)
+        {
+            var settingsWindow = new CustomHideWindow();
+            settingsWindow.Owner = this;
+            settingsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            if (settingsWindow.ShowDialog() == true &&
+                CustomHideCheckBox.IsChecked == true)
+            {
+                UpdateDataGridItems();
+            }
+        }
+
         private void ItemsDataGrid_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
         {
             string emptyText = "选择一项来查看它的完整内容";
@@ -298,7 +361,9 @@ namespace CleanerLogAnalyzer
             if (cc != null && cc.IsValid)
             {
                 if (cc.Column == CCleanerColumn) SelectedItemDetailTextBox.Text = ((CleanerLogItem)cc.Item).CCleanerContent;
-                else SelectedItemDetailTextBox.Text = ((CleanerLogItem)cc.Item).CortexContent;
+                else if (cc.Column == CortexColumn) SelectedItemDetailTextBox.Text = ((CleanerLogItem)cc.Item).CortexContent;
+                else if (cc.Column == CortexRepeatColumn) SelectedItemDetailTextBox.Text = ((CleanerLogItem)cc.Item).CortexRepeatCount.ToString();
+                else SelectedItemDetailTextBox.Text = emptyText;
 
                 if (string.IsNullOrEmpty(SelectedItemDetailTextBox.Text)) SelectedItemDetailTextBox.Text = emptyText;
             }
@@ -334,6 +399,7 @@ namespace CleanerLogAnalyzer
                     // 初始化列明
                     r0.CreateCell(0, CellType.String).SetCellValue("CCleaner");
                     r0.CreateCell(1, CellType.String).SetCellValue("Cortex");
+                    r0.CreateCell(2, CellType.String).SetCellValue("Repeat count in Cortex");
 
                     int rowIndex = 1;
                     foreach (var item in items)
@@ -341,6 +407,7 @@ namespace CleanerLogAnalyzer
                         var r = st.CreateRow(rowIndex);
                         r.CreateCell(0, CellType.String).SetCellValue(item.CCleanerContent);
                         r.CreateCell(1, CellType.String).SetCellValue(item.CortexContent);
+                        r.CreateCell(2, CellType.Numeric).SetCellValue(item.CortexRepeatCount);
 
                         rowIndex++;
                         ShowProgressMessage($"写入{item.Content}");

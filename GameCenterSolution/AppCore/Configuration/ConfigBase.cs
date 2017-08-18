@@ -16,6 +16,41 @@ namespace AppCore
     /// </summary>
     public abstract class ConfigBase
     {
+        #region classes
+        protected struct SerializePropertyResults
+        {
+            public bool Success { get; private set; }
+            public string Text { get; private set; }
+            public string Message { get; private set; }
+
+            public static SerializePropertyResults Complete(string text)
+            {
+                return new SerializePropertyResults { Success = true, Text = text };
+            }
+
+            public static SerializePropertyResults Fail(string message)
+            {
+                return new SerializePropertyResults { Success = false, Message = message };
+            }
+        }
+
+        protected struct DeserializePropertyResults
+        {
+            public bool Success { get; private set; }
+            public string Message { get; private set; }
+
+            public static DeserializePropertyResults Complete()
+            {
+                return new DeserializePropertyResults { Success = true };
+            }
+
+            public static DeserializePropertyResults Fail(string message)
+            {
+                return new DeserializePropertyResults { Success = false, Message = message };
+            }
+        }
+        #endregion
+
         #region fields
 
         #endregion
@@ -34,9 +69,9 @@ namespace AppCore
         #endregion
 
         #region private methods
-        protected abstract bool TrySerializeProperty(string propertyName, object value, out string text, out string message);
+        protected abstract SerializePropertyResults TrySerializeProperty(string propertyName);
 
-        protected abstract bool TryDeserializeProperty(string propertyName, string text, out object value, out string message);
+        protected abstract DeserializePropertyResults TryDeserializeProperty(string propertyName, string text);
 
         protected void Save(string configPath, bool ignoreError)
         {
@@ -51,18 +86,17 @@ namespace AppCore
             var properties = GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
             foreach (var propInfo in properties)
             {
-                object value = propInfo.GetValue(this);
-                string text, message;
-                if (!TrySerializeProperty(propInfo.Name, value, out text, out message))
+                var results = TrySerializeProperty(propInfo.Name);
+                if (!results.Success)
                 {
                     if (ignoreError)
                     {
-                        logger.Warn($"Serialize {propInfo.Name}={value} failed: {message}");
+                        logger.Warn($"Serialize {propInfo.Name} failed: {results.Message}");
                         continue;
                     }
-                    else throw new ConfigPropertySerializeException(propInfo.Name, value, message);
+                    else throw new ConfigPropertySerializeException(propInfo.Name, results.Message);
                 }
-                root.Add(new XElement(propInfo.Name, text ?? string.Empty));
+                root.Add(new XElement(propInfo.Name, results.Text ?? string.Empty));
             }
 
             try
@@ -138,18 +172,16 @@ namespace AppCore
                     string propText = element.Value;
                     if (propDic.ContainsKey(propName))
                     {
-                        object value;
-                        string message;
-                        if (!TryDeserializeProperty(propName, propText, out value, out message))
+                        var results = TryDeserializeProperty(propName, propText);
+                        if (!results.Success)
                         {
                             if (ignoreError)
                             {
-                                logger.Warn($"Deserialize {propName}={propText} failed.");
+                                logger.Warn($"Deserialize {propName}={propText} failed: {results.Message}");
                                 continue;
                             }
-                            else throw new ConfigPropertyDeserializeException(propName, propText, message);
+                            else throw new ConfigPropertyDeserializeException(propName, propText, results.Message);
                         }
-                        propDic[propName].SetValue(this, value);
                     }
                 }// foreach (var element in doc.Root.Elements())
             }// if (!string.IsNullOrEmpty(content))

@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xaml" />
@@ -47,21 +48,33 @@
   <ItemGroup>
     <Compile Include="App\ApplicationExtensions.cs" />
     <Compile Include="App\IApp.cs" />
+    <Compile Include="Common\ListDictionary.cs" />
+    <Compile Include="Common\StringNullOrEmptyException.cs" />
     <Compile Include="Configuration\ConfigBase.cs" />
     <Compile Include="Configuration\ConfigPropertyDeserializeException.cs" />
     <Compile Include="Configuration\ConfigPropertySerializeException.cs" />
+    <Compile Include="IoC\ActivationException.cs" />
+    <Compile Include="IoC\IIoC.cs" />
+    <Compile Include="IoC\IoC.cs" />
     <Compile Include="Language\ILanguageResource.cs" />
     <Compile Include="Language\LanguageChangedEventArgs.cs" />
     <Compile Include="Log\FileLogger.cs" />
     <Compile Include="Log\ILogger.cs" />
     <Compile Include="Log\LoggerBase.cs" />
+    <Compile Include="Module\CyclicDependencyFoundException.cs" />
+    <Compile Include="Module\DuplicateModulesException.cs" />
+    <Compile Include="Module\MissingModulesException.cs" />
+    <Compile Include="Module\ModularityException.cs" />
+    <Compile Include="Module\ModuleCatalog.cs" />
+    <Compile Include="Module\ModuleDependencySolver.cs" />
+    <Compile Include="Module\ModuleInfo.cs" />
     <Compile Include="Module\ModulesManager.cs" />
     <Compile Include="Module\ModulesConfig.cs" />
+    <Compile Include="Module\ModuleStates.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Account\" />
-    <Folder Include="Common\" />
     <Folder Include="Crash\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

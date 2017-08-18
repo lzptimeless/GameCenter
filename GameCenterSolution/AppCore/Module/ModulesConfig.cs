@@ -49,7 +49,7 @@ namespace AppCore
 
         protected override bool ThrowOnDuplicate
         {
-            get { return true; }
+            get { return false; }
         }
 
         public override ConfigurationElementCollectionType CollectionType
@@ -71,7 +71,7 @@ namespace AppCore
         {
             BaseAdd(module);
         }
-        
+
         public bool Contains(string name)
         {
             return base.BaseGet(name) != null;
@@ -109,6 +109,79 @@ namespace AppCore
         {
             get { return (string)this["type"]; }
             set { this["type"] = value; }
+        }
+
+        [ConfigurationProperty("", IsDefaultCollection = true, IsKey = false)]
+        public ModuleDependenciesConfigElementCollection Dependencies
+        {
+            get { return (ModuleDependenciesConfigElementCollection)this[""]; }
+            set { this[""] = value; }
+        }
+    }
+
+    [ConfigurationCollection(typeof(ModuleDependenciesConfigElementCollection))]
+    public class ModuleDependenciesConfigElementCollection : ConfigurationElementCollection
+    {
+        public ModuleDependenciesConfigElementCollection()
+        { }
+
+        public ModuleDependenciesConfigElementCollection(ModuleDependencyConfigElement[] dependencies)
+        {
+            if (dependencies == null) throw new System.ArgumentNullException("dependencies");
+            foreach (ModuleDependencyConfigElement dependency in dependencies)
+            {
+                BaseAdd(dependency);
+            }
+        }
+
+        protected override bool ThrowOnDuplicate
+        {
+            get { return false; }
+        }
+
+        public override ConfigurationElementCollectionType CollectionType
+        {
+            get { return ConfigurationElementCollectionType.BasicMap; }
+        }
+
+        protected override string ElementName
+        {
+            get { return "dependency"; }
+        }
+
+        public ModuleDependencyConfigElement this[int index]
+        {
+            get { return (ModuleDependencyConfigElement)base.BaseGet(index); }
+        }
+
+        public void Add(ModuleDependencyConfigElement module)
+        {
+            BaseAdd(module);
+        }
+
+        public bool Contains(string name)
+        {
+            return base.BaseGet(name) != null;
+        }
+
+        protected override ConfigurationElement CreateNewElement()
+        {
+            return new ModuleDependencyConfigElement();
+        }
+
+        protected override object GetElementKey(ConfigurationElement element)
+        {
+            return ((ModuleDependencyConfigElement)element).Name;
+        }
+    }
+
+    public class ModuleDependencyConfigElement : ConfigurationElement
+    {
+        [ConfigurationProperty("name", IsRequired = true, IsKey = true)]
+        public string Name
+        {
+            get { return (string)this["name"]; }
+            set { this["name"] = value; }
         }
     }
 }

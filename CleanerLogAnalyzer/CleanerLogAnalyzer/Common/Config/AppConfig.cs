@@ -18,6 +18,7 @@ namespace AppCore
 
         private AppConfig()
         {
+            CustomHideFileExtensions = new List<string>();
         }
 
         #region fields
@@ -54,6 +55,11 @@ namespace AppCore
         public string PreviousCortexCleanerLogPath { get; set; }
         #endregion
 
+        #region CustomHideFileExtensions
+        public const string CustomHideFileExtensionsName = "CustomHideFileExtensions";
+        public List<string> CustomHideFileExtensions { get; private set; }
+        #endregion
+
         #endregion
 
         #region public
@@ -64,35 +70,39 @@ namespace AppCore
         #endregion
 
         #region private
-        protected override bool TrySerializeProperty(string propertyName, object value, out string text)
+        protected override SerializePropertyResults TrySerializeProperty(string propertyName)
         {
-            text = string.Empty;
             switch (propertyName)
             {
                 case PreviousCCleanerLogPathName:
-                    text = (string)value;
-                    return true;
+                    return new SerializePropertyResults(PreviousCCleanerLogPath);
                 case PreviousCortexCleanerLogPathName:
-                    text = (string)value;
-                    return true;
+                    return new SerializePropertyResults(PreviousCortexCleanerLogPath);
+                case CustomHideFileExtensionsName:
+                    var text = string.Join(",", CustomHideFileExtensions);
+                    return new SerializePropertyResults(text);
                 default:
-                    return false;
+                    return new SerializePropertyResults(false, "Not supported.");
             }
         }
 
-        protected override bool TryDeserializeProperty(string propertyName, string text, out object value)
+        protected override DeserializePropertyResults TryDeserializeProperty(string propertyName, string text)
         {
-            value = null;
             switch (propertyName)
             {
                 case PreviousCCleanerLogPathName:
-                    value = text;
-                    return true;
+                    PreviousCCleanerLogPath = text;
+                    return new DeserializePropertyResults(true);
                 case PreviousCortexCleanerLogPathName:
-                    value = text;
-                    return true;
+                    PreviousCortexCleanerLogPath = text;
+                    return new DeserializePropertyResults(true);
+                case CustomHideFileExtensionsName:
+                    IEnumerable<string> extensions = (text ?? string.Empty).Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    extensions = extensions.Select(p => p.Trim()).Where(p => !string.IsNullOrEmpty(p));
+                    CustomHideFileExtensions.AddRange(extensions);
+                    return new DeserializePropertyResults(true);
                 default:
-                    return false;
+                    return new DeserializePropertyResults(false, "Not supported.");
             }
         }
         #endregion

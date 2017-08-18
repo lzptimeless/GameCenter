@@ -13,6 +13,47 @@ namespace AppCore
 {
     public abstract class ConfigBase
     {
+        #region classes
+        protected struct SerializePropertyResults
+        {
+            public SerializePropertyResults(string text)
+            {
+                Success = true;
+                Text = text;
+                Message = null;
+            }
+
+            public SerializePropertyResults(bool success, string message)
+            {
+                Success = success;
+                Text = null;
+                Message = message;
+            }
+
+            public bool Success { get; set; }
+            public string Text { get; set; }
+            public string Message { get; set; }
+        }
+
+        protected struct DeserializePropertyResults
+        {
+            public DeserializePropertyResults(bool success)
+            {
+                Success = success;
+                Message = null;
+            }
+
+            public DeserializePropertyResults(bool success, string message)
+            {
+                Success = success;
+                Message = message;
+            }
+
+            public bool Success { get; set; }
+            public string Message { get; set; }
+        }
+        #endregion
+
         #region fields
 
         #endregion
@@ -26,9 +67,9 @@ namespace AppCore
         #endregion
 
         #region private methods
-        protected abstract bool TrySerializeProperty(string propertyName, object value, out string text);
+        protected abstract SerializePropertyResults TrySerializeProperty(string propertyName);
 
-        protected abstract bool TryDeserializeProperty(string propertyName, string text, out object value);
+        protected abstract DeserializePropertyResults TryDeserializeProperty(string propertyName, string text);
 
         protected void Save(string configPath)
         {
@@ -41,14 +82,13 @@ namespace AppCore
             var properties = GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
             foreach (var propInfo in properties)
             {
-                object value = propInfo.GetValue(this);
-                string text;
-                if (!TrySerializeProperty(propInfo.Name, value, out text))
+                var results = TrySerializeProperty(propInfo.Name);
+                if (!results.Success)
                 {
-                    logger.Warn($"Serialize {propInfo.Name}={value} failed.");
+                    logger.Warn($"Serialize {propInfo.Name} failed: {results.Message}");
                     continue;
                 }
-                root.Add(new XElement(propInfo.Name, text));
+                root.Add(new XElement(propInfo.Name, results.Text ?? string.Empty));
             }
 
             try
@@ -105,13 +145,12 @@ namespace AppCore
                         string propText = element.Value;
                         if (propDic.ContainsKey(propName))
                         {
-                            object value;
-                            if (!TryDeserializeProperty(propName, propText, out value))
+                            var results = TryDeserializeProperty(propName, propText);
+                            if (!results.Success)
                             {
-                                logger.Warn($"Deserialize {propName}={propText} failed.");
+                                logger.Warn($"Deserialize {propName}={propText} failed: {results.Message}");
                                 continue;
                             }
-                            propDic[propName].SetValue(this, value);
                         }
                     }// foreach (var element in doc.Root.Elements())
                 }

@@ -8,12 +8,12 @@ namespace AppCore
 {
     public class ConfigPropertySerializeException : Exception
     {
-        public ConfigPropertySerializeException(string propName, object value, string errorMessage)
-            : this(propName, value, errorMessage, null)
+        public ConfigPropertySerializeException(string propName, string errorMessage)
+            : this(propName, errorMessage, null)
         { }
 
-        public ConfigPropertySerializeException(string propName, object value, string errorMessage, Exception innerEx)
-            : base($"Serialize {propName} = {value} failed: {errorMessage}", innerEx)
+        public ConfigPropertySerializeException(string propName, string errorMessage, Exception innerEx)
+            : base($"Serialize {propName} failed: {errorMessage}", innerEx)
         { }
     }
 }

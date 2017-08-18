@@ -7,7 +7,9 @@
         xmlns:md="clr-namespace:CleanerLogAnalyzer.Models"
         xmlns:ctl="clr-namespace:CleanerLogAnalyzer.Controls"
         mc:Ignorable="d"
-        Title="Cleaner log analyzer" Height="600" Width="900"
+        Title="Cleaner log analyzer" 
+        Height="600" Width="900"
+        MinHeight="600" MinWidth="900"
         Loaded="Window_Loaded"
         Icon="/Images/AppIcon.png">
     <Grid>
@@ -51,12 +53,20 @@
         </Border>
         <Grid Grid.Row="2">
             <StackPanel Margin="10" Orientation="Horizontal" HorizontalAlignment="Left">
-                <CheckBox x:Name="HideSameItemCheckBox" Content="隐藏相同的项"
+                <CheckBox x:Name="HideSameItemCheckBox" Content="隐藏相同的项" VerticalAlignment="Center"
                           Checked="HideSameItemCheckBox_Checked" Unchecked="HideSameItemCheckBox_Unchecked"/>
-                <CheckBox x:Name="HideCCleanerCheckBox" Content="隐藏CCleaner的项" Margin="10,0,0,0"
+                <CheckBox x:Name="HideCCleanerCheckBox" Content="隐藏CCleaner的项" Margin="10,0,0,0" VerticalAlignment="Center"
                           Checked="HideCCleanerCheckBox_Checked" Unchecked="HideCCleanerCheckBox_Unchecked"/>
-                <CheckBox x:Name="HideCortexCheckBox" Content="隐藏Cortex的项" Margin="10,0,0,0"
+                <CheckBox x:Name="HideCortexCheckBox" Content="隐藏Cortex的项" Margin="10,0,0,0" VerticalAlignment="Center"
                           Checked="HideCortexCheckBox_Checked" Unchecked="HideCortexCheckBox_Unchecked"/>
+                <CheckBox x:Name="OnlyShowRepeatCheckBox" Content="只显示Cortex重复的项" Margin="10,0,0,0" VerticalAlignment="Center"
+                          Checked="OnlyShowRepeatCheckBox_Checked" Unchecked="OnlyShowRepeatCheckBox_Unchecked"/>
+                <CheckBox x:Name="SortReverseByRepeatCheckBox" Content="按重复数倒序显示" Margin="10,0,0,0" VerticalAlignment="Center"
+                          Checked="SortReverseByRepeatCheckBox_Checked" Unchecked="SortReverseByRepeatCheckBox_Unchecked"/>
+                <CheckBox x:Name="CustomHideCheckBox" Content="" Margin="10,0,0,0" VerticalAlignment="Center"
+                          Checked="CustomHideCheckBox_Checked" Unchecked="CustomHideCheckBox_Unchecked"/>
+                <Button x:Name="CustomHideButton" Content="自定义隐藏" Height="25" Width="80" Margin="2,0,0,0"
+                        Click="CustomHideButton_Click"/>
             </StackPanel>
             <Button x:Name="ExportButton" HorizontalAlignment="Right" Height="25" Width="80" Margin="0,0,10,0"
                     Content="导出XLSX"
@@ -252,6 +262,19 @@
                                     <Setter TargetName="ContentTextBlock" Property="Foreground" Value="Green"/>
                                 </DataTrigger>
                             </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn x:Name="CortexRepeatColumn" Width="50" ClipboardContentBinding="{Binding CortexRepeatCount}">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="重复数"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="md:CleanerLogItem">
+                            <TextBlock x:Name="RepeatCountTextBlock" Text="{Binding CortexRepeatCount, Mode=OneWay}"
+                                       Foreground="Black"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
