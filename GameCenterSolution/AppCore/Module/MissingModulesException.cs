@@ -10,36 +10,36 @@ namespace AppCore
     [Serializable]
     public class MissingModulesException : ModularityException
     {
-        public MissingModulesException(IEnumerable<string> moduleNames)
+        public MissingModulesException(IEnumerable<string> moduleInterfaces)
         {
-            _moduleNames.AddRange(moduleNames);
+            _moduleInterfaces.AddRange(moduleInterfaces);
         }
 
         protected MissingModulesException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            var moduleNames = (info.GetString("ModuleNames") ?? string.Empty).Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            _moduleNames.AddRange(moduleNames);
+            var moduleInterfaces = (info.GetString("ModuleInterfaces") ?? string.Empty).Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            _moduleInterfaces.AddRange(moduleInterfaces);
         }
 
-        private List<string> _moduleNames = new List<string>();
-        public IEnumerable<string> ModuleNames
+        private List<string> _moduleInterfaces = new List<string>();
+        public IEnumerable<string> ModuleInterfaces
         {
-            get { return _moduleNames; }
+            get { return _moduleInterfaces; }
         }
 
         public override string Message
         {
             get
             {
-                return $"Missing modules: {string.Join(",", _moduleNames)}";
+                return $"Missing modules: {string.Join(",", _moduleInterfaces)}";
             }
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
-            info.AddValue("ModuleNames", string.Join(",", _moduleNames));
+            info.AddValue("ModuleInterfaces", string.Join(",", _moduleInterfaces));
         }
     }
 }

@@ -137,6 +137,7 @@ namespace CleanerLogAnalyzer
             bool isHideCCleaner = HideCCleanerCheckBox.IsChecked == true;
             bool isHideCortex = HideCortexCheckBox.IsChecked == true;
             bool onlyShowRepeat = OnlyShowRepeatCheckBox.IsChecked == true;
+            bool mergeFileID = MergeFileIDCheckBox.IsChecked == true;
             bool sortReverseByRepeat = SortReverseByRepeatCheckBox.IsChecked == true;
             bool customHideEabled = CustomHideCheckBox.IsChecked == true;
             var customHideExtensions = AppConfig.Default.CustomHideFileExtensions.Select(p => '.' + p);
@@ -154,6 +155,7 @@ namespace CleanerLogAnalyzer
                         var extension = System.IO.Path.GetExtension((item.Content ?? string.Empty).Trim());
                         if (customHideExtensions.Any(p => string.Equals(extension, p, StringComparison.OrdinalIgnoreCase))) continue;
                     }
+                    if (mergeFileID && item.CortexFileID != 0 && realItems.Any(l => l.CortexFileID == item.CortexFileID)) continue;
 
                     realItems.Add(item);
                 }
@@ -251,7 +253,7 @@ namespace CleanerLogAnalyzer
             if (string.IsNullOrEmpty(logPath)) throw new ArgumentNullException("logPath");
             if (!File.Exists(logPath)) throw new FileNotFoundException("Cortex log not found.", logPath);
 
-            Regex logItemRegex = new Regex(@" (?<path>[A-Za-z]:\\.+) ", RegexOptions.IgnoreCase);
+            Regex logItemRegex = new Regex(@"hunt:(?<catagoryid>\d+),(?<fileid>\d+),(?<path>[A-Za-z]:\\.+)", RegexOptions.IgnoreCase);
             List<CleanerLogItem> logItems = new List<CleanerLogItem>();
             using (StreamReader sw = new StreamReader(logPath))
             {
@@ -261,8 +263,18 @@ namespace CleanerLogAnalyzer
                     Match mh = logItemRegex.Match(line);
                     if (mh.Success)
                     {
-                        string content = mh.Groups["path"].Value;
-                        logItems.Add(new CleanerLogItem { Content = content, Parents = CleanerLogItemParents.Cortex });
+                        string content = mh.Groups["path"]?.Value;
+                        int catagoryID, fileID;
+                        int.TryParse(mh.Groups["catagoryid"]?.Value ?? string.Empty, out catagoryID);
+                        int.TryParse(mh.Groups["fileid"]?.Value ?? string.Empty, out fileID);
+                        var logItem = new CleanerLogItem
+                        {
+                            Content = content,
+                            Parents = CleanerLogItemParents.Cortex,
+                            CortexCatagoryID = catagoryID,
+                            CortexFileID = fileID
+                        };
+                        logItems.Add(logItem);
                         if (ShowAnalyzeProgressIdle()) ShowProgressMessage($"读取{content}");
                     }
                 }
@@ -331,6 +343,16 @@ namespace CleanerLogAnalyzer
         }
 
         private void CustomHideCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            UpdateDataGridItems();
+        }
+
+        private void MergeFileIDCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            UpdateDataGridItems();
+        }
+
+        private void MergeFileIDCheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
             UpdateDataGridItems();
         }

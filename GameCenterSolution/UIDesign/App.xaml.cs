@@ -18,7 +18,7 @@ namespace UIDesign
         {
             base.OnStartup(e);
 
-            ModulesConfigSection modulesSection = ModulesConfigSection.GetConfig();
+            //ModulesConfigSection modulesSection = ModulesConfigSection.GetConfig();
             //var oldCulture = UIDesign.Properties.Resources.Culture;
             //UIDesign.Properties.Resources.Culture = new System.Globalization.CultureInfo("en-US");
         }

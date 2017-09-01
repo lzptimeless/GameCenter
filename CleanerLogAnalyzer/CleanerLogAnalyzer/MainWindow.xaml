@@ -8,7 +8,7 @@
         xmlns:ctl="clr-namespace:CleanerLogAnalyzer.Controls"
         mc:Ignorable="d"
         Title="Cleaner log analyzer" 
-        Height="600" Width="900"
+        Height="600" Width="1000"
         MinHeight="600" MinWidth="900"
         Loaded="Window_Loaded"
         Icon="/Images/AppIcon.png">
@@ -61,6 +61,8 @@
                           Checked="HideCortexCheckBox_Checked" Unchecked="HideCortexCheckBox_Unchecked"/>
                 <CheckBox x:Name="OnlyShowRepeatCheckBox" Content="只显示Cortex重复的项" Margin="10,0,0,0" VerticalAlignment="Center"
                           Checked="OnlyShowRepeatCheckBox_Checked" Unchecked="OnlyShowRepeatCheckBox_Unchecked"/>
+                <CheckBox x:Name="MergeFileIDCheckBox" Content="合并FileID" Margin="10,0,0,0" VerticalAlignment="Center"
+                          Checked="MergeFileIDCheckBox_Checked" Unchecked="MergeFileIDCheckBox_Unchecked"/>
                 <CheckBox x:Name="SortReverseByRepeatCheckBox" Content="按重复数倒序显示" Margin="10,0,0,0" VerticalAlignment="Center"
                           Checked="SortReverseByRepeatCheckBox_Checked" Unchecked="SortReverseByRepeatCheckBox_Unchecked"/>
                 <CheckBox x:Name="CustomHideCheckBox" Content="" Margin="10,0,0,0" VerticalAlignment="Center"
@@ -229,6 +231,32 @@
                 </Style>
             </DataGrid.CellStyle>
             <DataGrid.Columns>
+                <DataGridTemplateColumn x:Name="CortexCatagoryID" Width="75" ClipboardContentBinding="{Binding CortexCatagoryID}">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="CatagoryID"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="md:CleanerLogItem">
+                            <TextBlock x:Name="ContentTextBlock" Text="{Binding CortexCatagoryID, Mode=OneWay}"
+                                       Foreground="#808080"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn x:Name="CortexFileID" Width="70" ClipboardContentBinding="{Binding CortexFileID}">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="FileID"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="md:CleanerLogItem">
+                            <TextBlock x:Name="ContentTextBlock" Text="{Binding CortexFileID, Mode=OneWay}"
+                                       Foreground="#808080"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTemplateColumn x:Name="CCleanerColumn" Width="5*" ClipboardContentBinding="{Binding CCleanerContent}">
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>

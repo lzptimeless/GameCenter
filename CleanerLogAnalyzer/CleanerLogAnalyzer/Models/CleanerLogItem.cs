@@ -37,6 +37,10 @@ namespace CleanerLogAnalyzer.Models
         public int CCleanerRepeatCount { get; set; }
 
         public int CortexRepeatCount { get; set; }
+
+        public int CortexCatagoryID { get; set; }
+
+        public int CortexFileID { get; set; }
         #endregion
     }
 }

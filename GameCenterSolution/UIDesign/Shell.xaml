@@ -11,6 +11,7 @@
         Style="{StaticResource WindowShell}">
     <Grid x:Uid="Grid_1">
         <Button x:Uid="Button_1" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10,5"
-                Content="确定"></Button>
+                Content="确定"
+                Click="Button_Click"></Button>
     </Grid>
 </Window>

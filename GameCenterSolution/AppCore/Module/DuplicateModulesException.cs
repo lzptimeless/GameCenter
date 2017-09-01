@@ -10,34 +10,36 @@ namespace AppCore
     [Serializable]
     public class DuplicateModulesException : ModularityException
     {
-        public DuplicateModulesException(IEnumerable<string> moduleNames)
-        { }
+        public DuplicateModulesException(IEnumerable<string> moduleTypes)
+        {
+            _moduleTypes.AddRange(moduleTypes);
+        }
 
         protected DuplicateModulesException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            var moduleNames = (info.GetString("ModuleNames") ?? string.Empty).Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            if (moduleNames.Length > 0) _moduleNames.AddRange(moduleNames);
+            var moduleTypes = (info.GetString("ModuleTypes") ?? string.Empty).Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            if (moduleTypes.Length > 0) _moduleTypes.AddRange(moduleTypes);
         }
 
-        private List<string> _moduleNames = new List<string>();
-        public IEnumerable<string> ModuleNames
+        private List<string> _moduleTypes = new List<string>();
+        public IEnumerable<string> ModuleTypes
         {
-            get { return _moduleNames; }
+            get { return _moduleTypes; }
         }
 
         public override string Message
         {
             get
             {
-                return $"These modules duplicate: {string.Join(",", _moduleNames)}";
+                return $"These modules duplicate: {string.Join(",", _moduleTypes)}";
             }
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
-            info.AddValue("ModuleNames", string.Join(",", _moduleNames));
+            info.AddValue("ModuleTypes", string.Join(",", _moduleTypes));
         }
     }
 }

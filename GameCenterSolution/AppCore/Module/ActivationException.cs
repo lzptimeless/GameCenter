@@ -9,7 +9,7 @@ namespace AppCore
     /// <summary>
     /// The standard exception thrown when a ServiceLocator has an error in resolving an object.
     /// </summary>
-    public partial class ActivationException : Exception
+    public class ActivationException : Exception
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Exception" /> class.
