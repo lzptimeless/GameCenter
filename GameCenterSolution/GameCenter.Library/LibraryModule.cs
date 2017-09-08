@@ -1,5 +1,4 @@
 ﻿using AppCore;
-using GameCenter.Enhancement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,10 +41,10 @@ namespace GameCenter.Library
         /// 通过<see cref="ModuleInitializeAttribute"/>定义依赖模块，在这个函数被调用的时候
         /// 会按照定义顺序传入，框架会保证这些依赖的模块已经初始化好了
         /// </remarks>
-        [ModuleInitialize(new[] { typeof(IEnhancement) })]
+        // [ModuleInitialize(new[] { typeof(IEnhancement) })]
         public void Initialize(IModule[] dependencies)
         {
-            Console.WriteLine($"Library initialize: {dependencies[0]}");
+            //Console.WriteLine($"Library initialize: {dependencies[0]}");
         }
 
         /// <summary>

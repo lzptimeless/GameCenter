@@ -79,7 +79,7 @@ namespace AppCore
             if (string.IsNullOrWhiteSpace(rootName)) throw new InvalidOperationException("RootName is empty.");
             if (string.IsNullOrEmpty(configPath)) throw new InvalidOperationException("ConfigPath is empty.");
 
-            ILogger logger = Application.Current.ToIApp().Logger;
+            ILogger logger = Core.Instance.Logger;
             XDocument doc = new XDocument();
             var root = new XElement(rootName);
             doc.Add(root);
@@ -118,7 +118,7 @@ namespace AppCore
         {
             if (string.IsNullOrEmpty(configPath)) throw new InvalidOperationException("ConfigPath is empty.");
 
-            ILogger logger = Application.Current.ToIApp().Logger;
+            ILogger logger = Core.Instance.Logger;
             if (!File.Exists(configPath))
             {
                 logger.Warn($"Can not read config, file not exist: {configPath}");

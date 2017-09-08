@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AppCore
 {
-    internal interface IModuleManager
+    public interface IModuleManager
     {
         /// <summary>
         /// 通过模块接口获取模块

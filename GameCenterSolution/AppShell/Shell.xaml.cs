@@ -13,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace GameCenter
+namespace AppShell
 {
     /// <summary>
     /// Interaction logic for Shell.xaml
@@ -33,10 +33,12 @@ namespace GameCenter
 
         public void PreInitializeModule(IModuleManager moduleManager)
         {
+            
         }
 
         public void Release()
         {
+            
         }
     }
 }

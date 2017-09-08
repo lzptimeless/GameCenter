@@ -49,10 +49,6 @@
       <Project>{F37740D6-A6D1-42B0-94CC-1B522076384A}</Project>
       <Name>AppCore</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GameCenter.Enhancement.Interfaces\GameCenter.Enhancement.Interfaces.csproj">
-      <Project>{FC474D68-A8CD-4A16-8FCC-F9607341F649}</Project>
-      <Name>GameCenter.Enhancement.Interfaces</Name>
-    </ProjectReference>
     <ProjectReference Include="..\GameCenter.Library.Interfaces\GameCenter.Library.Interfaces.csproj">
       <Project>{d88d15e0-5a8f-46d8-ba75-63c74a711c19}</Project>
       <Name>GameCenter.Library.Interfaces</Name>
@@ -61,7 +57,10 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if not exist "$(SolutionDir)TestConsole\$(OutDir)Modules" md "$(SolutionDir)TestConsole\$(OutDir)Modules"
-copy "$(TargetPath)" "$(SolutionDir)TestConsole\$(OutDir)Modules"</PostBuildEvent>
+copy "$(TargetPath)" "$(SolutionDir)TestConsole\$(OutDir)Modules"
+
+if not exist "$(SolutionDir)AppShell\$(OutDir)Modules" md "$(SolutionDir)AppShell\$(OutDir)Modules"
+copy "$(TargetPath)" "$(SolutionDir)AppShell\$(OutDir)Modules"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

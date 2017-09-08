@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace AppCore
 {
-    public interface IApp
+    internal class UIInfo
     {
-        ILogger Logger { get; }
+        public string Type { get; set; }
+
+        public string File { get; set; }
     }
 }

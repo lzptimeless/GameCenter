@@ -1,5 +1,4 @@
-﻿using AppCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,32 +10,19 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace GameCenter
+namespace GameCenter.UI
 {
     /// <summary>
-    /// Interaction logic for Shell.xaml
+    /// Interaction logic for Home.xaml
     /// </summary>
-    public partial class Shell : Window, IUI
+    public partial class Home : UserControl
     {
-        public Shell()
+        public Home()
         {
             InitializeComponent();
-        }
-
-        public void Initialize()
-        {
-            Application.Current.MainWindow = this;
-            Show();
-        }
-
-        public void PreInitializeModule(IModuleManager moduleManager)
-        {
-        }
-
-        public void Release()
-        {
         }
     }
 }

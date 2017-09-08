@@ -48,6 +48,17 @@ namespace AppCore
             CreateModules(_catalog.Items);
         }
 
+        internal void ReleaseModules()
+        {
+            var modules = _container.GetModules();
+            modules = modules.Reverse().ToArray();
+
+            foreach (var module in modules)
+            {
+                module.Release();
+            }
+        }
+
         private void CreateModules(IEnumerable<ModuleInfo> modules)
         {
             foreach (var moduleInfo in modules)

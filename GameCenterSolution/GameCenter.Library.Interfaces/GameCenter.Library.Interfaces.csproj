@@ -55,7 +55,10 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if not exist "$(SolutionDir)TestConsole\$(OutDir)ModuleInterfaces" md "$(SolutionDir)TestConsole\$(OutDir)ModuleInterfaces"
-copy "$(TargetPath)" "$(SolutionDir)TestConsole\$(OutDir)ModuleInterfaces"</PostBuildEvent>
+copy "$(TargetPath)" "$(SolutionDir)TestConsole\$(OutDir)ModuleInterfaces"
+
+if not exist "$(SolutionDir)AppShell\$(OutDir)ModuleInterfaces" md "$(SolutionDir)AppShell\$(OutDir)ModuleInterfaces"
+copy "$(TargetPath)" "$(SolutionDir)AppShell\$(OutDir)ModuleInterfaces"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
