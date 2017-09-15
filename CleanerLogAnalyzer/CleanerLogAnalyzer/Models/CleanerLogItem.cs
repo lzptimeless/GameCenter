@@ -10,6 +10,8 @@ namespace CleanerLogAnalyzer.Models
     public class CleanerLogItem : BindableBase
     {
         #region properties
+        public CleanerLogItemTypes Type { get; set; }
+
         public string Content { get; set; }
 
         public CleanerLogItemParents Parents { get; set;}

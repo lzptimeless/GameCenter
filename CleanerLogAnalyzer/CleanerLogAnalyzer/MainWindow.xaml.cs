@@ -229,18 +229,64 @@ namespace CleanerLogAnalyzer
             if (!File.Exists(logPath)) throw new FileNotFoundException("CCleaner log not found.", logPath);
 
             Regex logItemRegex = new Regex(@"^(?<path>[A-Za-z]:\\.+)\t.+$", RegexOptions.IgnoreCase);
+            Regex regMisDllItemRegex = new Regex(@"^Missing Shared DLL\s+(?<dll>.+)\s+(?<reg>(HKCU|HKLM|HKCR|HKU|HKCC)\\.+)$");
+            Regex regOpenItemRegex = new Regex(@"^Open with Application Issue\s+(?<cmd>.+)\s+(?<reg>(HKCU|HKLM|HKCR|HKU|HKCC)\\.+)$");
+            Regex regAppPathItemRegex = new Regex(@"^Application Paths Issue\s+(?<path>.+)\s+(?<reg>(HKCU|HKLM|HKCR|HKU|HKCC)\\.+)$");
+            Regex regInstallerItemRegex = new Regex(@"^Installer Reference Issue\s+(?<path>.+)\s+(?<reg>(HKCU|HKLM|HKCR|HKU|HKCC)\\.+)$");
+            Regex regfwRuleItemRegex = new Regex(@"^Invalid firewall rule\s+(?<rule>.+)\s+(?<reg>(HKCU|HKLM|HKCR|HKU|HKCC)\\.+)$");
+            Regex regMisMUIItemRegex = new Regex(@"^Missing MUI Reference\s+(?<path>.+)\s+(?<reg>(HKCU|HKLM|HKCR|HKU|HKCC)\\.+)$");
+            Regex regNormalItemRegex = new Regex(@"(HKCU|HKLM|HKCR|HKU|HKCC)\\.+$");
             List<CleanerLogItem> logItems = new List<CleanerLogItem>();
             using (StreamReader sw = new StreamReader(logPath))
             {
                 while (!sw.EndOfStream)
                 {
                     string line = (sw.ReadLine() ?? string.Empty).Trim();
-                    Match mh = logItemRegex.Match(line);
-                    if (mh.Success)
+                    Match fileMh = logItemRegex.Match(line);
+                    if (fileMh.Success)
                     {
-                        string content = mh.Groups["path"].Value;
-                        logItems.Add(new CleanerLogItem { Content = content, Parents = CleanerLogItemParents.CCleaner });
+                        string content = fileMh.Groups["path"].Value;
+                        logItems.Add(new CleanerLogItem { Content = content, Parents = CleanerLogItemParents.CCleaner, Type = CleanerLogItemTypes.File });
                         if (ShowAnalyzeProgressIdle()) ShowProgressMessage($"读取{content}");
+                    }
+                    else
+                    {
+                        Match regMh = null;
+                        string content = null;
+                        if ((regMh = regMisDllItemRegex.Match(line)).Success)
+                        {
+                            content = $"{regMh.Groups["reg"].Value}:{regMh.Groups["dll"].Value.Trim()}";
+                        }
+                        else if ((regMh = regOpenItemRegex.Match(line)).Success)
+                        {
+                            content = $"{regMh.Groups["reg"].Value}:{regMh.Groups["cmd"].Value.Trim()}";
+                        }
+                        else if ((regMh = regAppPathItemRegex.Match(line)).Success)
+                        {
+                            content = $"{regMh.Groups["reg"].Value}:{regMh.Groups["path"].Value.Trim()}";
+                        }
+                        else if ((regMh = regInstallerItemRegex.Match(line)).Success)
+                        {
+                            content = $"{regMh.Groups["reg"].Value}:{regMh.Groups["path"].Value.Trim()}";
+                        }
+                        else if ((regMh = regfwRuleItemRegex.Match(line)).Success)
+                        {
+                            content = $"{regMh.Groups["reg"].Value}:{regMh.Groups["rule"].Value.Trim()}";
+                        }
+                        else if ((regMh = regMisMUIItemRegex.Match(line)).Success)
+                        {
+                            content = $"{regMh.Groups["reg"].Value}:{regMh.Groups["path"].Value.Trim()}";
+                        }
+                        else if ((regMh = regNormalItemRegex.Match(line)).Success)
+                        {
+                            content = regMh.Value;
+                        }
+
+                        if (!string.IsNullOrEmpty(content))
+                        {
+                            logItems.Add(new CleanerLogItem { Content = content, Parents = CleanerLogItemParents.CCleaner, Type = CleanerLogItemTypes.Registry });
+                            if (ShowAnalyzeProgressIdle()) ShowProgressMessage($"读取{content}");
+                        }
                     }
                 }
             }
@@ -254,28 +300,50 @@ namespace CleanerLogAnalyzer
             if (!File.Exists(logPath)) throw new FileNotFoundException("Cortex log not found.", logPath);
 
             Regex logItemRegex = new Regex(@"hunt:(?<catagoryid>\d+),(?<fileid>\d+),(?<path>[A-Za-z]:\\.+)", RegexOptions.IgnoreCase);
+            Regex regItemRegex = new Regex(@"hunt:(?<catagoryid>\d+),Register,(?<path>.+)", RegexOptions.IgnoreCase);
             List<CleanerLogItem> logItems = new List<CleanerLogItem>();
             using (StreamReader sw = new StreamReader(logPath))
             {
                 while (!sw.EndOfStream)
                 {
                     string line = (sw.ReadLine() ?? string.Empty).Trim();
-                    Match mh = logItemRegex.Match(line);
-                    if (mh.Success)
+                    Match fileMh = logItemRegex.Match(line);
+                    if (fileMh.Success)
                     {
-                        string content = mh.Groups["path"]?.Value;
+                        string content = fileMh.Groups["path"]?.Value;
                         int catagoryID, fileID;
-                        int.TryParse(mh.Groups["catagoryid"]?.Value ?? string.Empty, out catagoryID);
-                        int.TryParse(mh.Groups["fileid"]?.Value ?? string.Empty, out fileID);
+                        int.TryParse(fileMh.Groups["catagoryid"]?.Value ?? string.Empty, out catagoryID);
+                        int.TryParse(fileMh.Groups["fileid"]?.Value ?? string.Empty, out fileID);
                         var logItem = new CleanerLogItem
                         {
                             Content = content,
                             Parents = CleanerLogItemParents.Cortex,
+                            Type = CleanerLogItemTypes.File,
                             CortexCatagoryID = catagoryID,
                             CortexFileID = fileID
                         };
                         logItems.Add(logItem);
                         if (ShowAnalyzeProgressIdle()) ShowProgressMessage($"读取{content}");
+                    }
+                    else
+                    {
+                        Match regMh = regItemRegex.Match(line);
+                        if (regMh.Success)
+                        {
+                            string content = regMh.Groups["path"]?.Value;
+                            int catagoryID, fileID = 0;
+                            int.TryParse(regMh.Groups["catagoryid"]?.Value ?? string.Empty, out catagoryID);
+                            var logItem = new CleanerLogItem
+                            {
+                                Content = content,
+                                Parents = CleanerLogItemParents.Cortex,
+                                Type = CleanerLogItemTypes.Registry,
+                                CortexCatagoryID = catagoryID,
+                                CortexFileID = fileID
+                            };
+                            logItems.Add(logItem);
+                            if (ShowAnalyzeProgressIdle()) ShowProgressMessage($"读取{content}");
+                        }
                     }
                 }
             }

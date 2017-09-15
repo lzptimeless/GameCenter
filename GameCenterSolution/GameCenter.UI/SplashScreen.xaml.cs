@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AppCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,11 +19,19 @@ namespace GameCenter.UI
     /// <summary>
     /// Interaction logic for SplashScreen.xaml
     /// </summary>
-    public partial class SplashScreen : UserControl
+    public partial class SplashScreen : UserControl, ISplashScreen
     {
         public SplashScreen()
         {
             InitializeComponent();
+        }
+
+        public void Initialize()
+        {
+        }
+
+        public void Release()
+        {
         }
     }
 }

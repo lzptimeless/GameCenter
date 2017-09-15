@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace AppCore
 {
-    internal class UIInfo
+    public interface IBar
     {
-        public string Type { get; set; }
+        void Initialize();
 
-        public string File { get; set; }
+        void Release();
     }
 }

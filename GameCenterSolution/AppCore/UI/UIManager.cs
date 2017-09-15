@@ -12,56 +12,126 @@ namespace AppCore
     {
         public UIManager()
         {
-            _uiInfos = new List<UIInfo>();
-            _uis = new List<IUI>();
         }
 
-        private List<UIInfo> _uiInfos;
-        private List<IUI> _uis;
+        private IGUI _gui;
+        private ISplashScreen _splashScreen;
+        private IGUIFactory _guiFactory;
+        private INavigator _navigator;
 
-        internal void LoadUIs()
+        internal void Load()
         {
             SetReflectionOnlyAssemblyResolve();
-            SearchUIInfos();
-            CreateUIs();
+            LoadGUI();
             ClearReflectionOnlyAssemblyResolve();
         }
 
-        internal void PreInitializeModule(IModuleManager moduleManager)
+        internal void StartWork()
         {
-            if (moduleManager == null) throw new ArgumentNullException("moduleManager");
-
-            foreach (var ui in _uis)
+            // 加载边栏
+            LoadBars();
+            // 加载导航器
+            LoadNavigator();
+            // 进入工作页面
+            _gui.GoWorkplace();
+            // 启动画面已经不需要了，释放掉
+            if (_splashScreen != null)
             {
-                ui.PreInitializeModule(moduleManager);
+                _splashScreen.Release();
+                _splashScreen = null;
+            }
+            // 设置各个边栏
+            var captionBar = _guiFactory.CreateCaptionBar();
+            var topBar = _guiFactory.CreateTopBar();
+            var bottomBar = _guiFactory.CreateBottomBar();
+            var leftBar = _guiFactory.CreateLeftBar();
+            var rightBar = _guiFactory.CreateRightBar();
+            _gui.SetBars(captionBar, topBar, bottomBar, leftBar, rightBar);
+            // 加载Home页面
+            _navigator.Home();
+        }
+
+        internal void Release()
+        {
+            if (_gui.Count > 0) _gui.RemovePage(0, _gui.Count);
+
+            if (_captionBar != null)
+            {
+                _captionBar.Release();
+                _captionBar = null;
+            }
+            if (_topBar != null)
+            {
+                _topBar.Release();
+                _topBar = null;
+            }
+            if (_bottomBar != null)
+            {
+                _bottomBar.Release();
+                _bottomBar = null;
+            }
+            if (_leftBar != null)
+            {
+                _leftBar.Release();
+                _leftBar = null;
+            }
+            if (_rightBar != null)
+            {
+                _rightBar.Release();
+                _rightBar = null;
+            }
+            if (_gui != null)
+            {
+                _gui.Release();
+                _gui = null;
             }
         }
 
-        internal void ReleaseUIs()
+        private void LoadSplashScreen()
         {
-            foreach (var ui in _uis)
+            List<string> uiPaths = new List<string>();
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string uiDir = Path.Combine(baseDir, "UIs");
+
+            if (Directory.Exists(uiDir))
+                uiPaths.AddRange(Directory.GetFiles(uiDir, "*.dll"));
+
+            uiPaths.AddRange(Directory.GetFiles(baseDir, "*.ui.dll"));
+
+            foreach (var asmPath in uiPaths)
             {
-                ui.Release();
+                Assembly asm = Assembly.ReflectionOnlyLoadFrom(asmPath);
             }
         }
 
-        private void CreateUIs()
+        private void LoadGUI()
         {
-            foreach (var uiInfo in _uiInfos)
+            string iguiFullName = typeof(IGUI).FullName;
+            Type guiType = null;
+            foreach (var type in Assembly.GetEntryAssembly().GetTypes())
             {
-                // 加载程序集
-                Assembly asm = GetOrLoadAssembly(uiInfo.File);
-                Type uiType = asm.GetType(uiInfo.Type);
-
-                // 创建UI
-                IUI ui = Activator.CreateInstance(uiType) as IUI;
-
-                // 初始化UI
-                ui.Initialize();
-
-                // 添加到UI集合
-                _uis.Add(ui);
+                if (type.FindInterfaces((i, c) => i.FullName == iguiFullName, null).Length > 0)
+                {
+                    guiType = type;
+                    break;
+                }
             }
+
+            if (guiType == null) throw new InvalidOperationException("Can not found IGUI.");
+
+            // 创建UI
+            IGUI gui = Activator.CreateInstance(guiType) as IGUI;
+            // 初始化UI
+            gui.Initialize(_splashScreen);
+            _gui = gui;
+        }
+
+        private void LoadBars()
+        { }
+
+        private void LoadNavigator()
+        {
+
         }
 
         private Assembly GetOrLoadAssembly(string codeBase)
@@ -73,47 +143,6 @@ namespace AppCore
             }
 
             return asm;
-        }
-
-        private void SearchUIInfos()
-        {
-            string iuiFullName = typeof(IUI).FullName;
-            var assemblyPaths = GetUIAssemblies();
-            foreach (var asmPath in assemblyPaths)
-            {
-                Assembly asm = Assembly.ReflectionOnlyLoadFrom(asmPath);
-                foreach (var type in asm.GetTypes())
-                {
-                    if (type.FindInterfaces((i, c) => i.FullName == iuiFullName, null).Length > 0)
-                    {
-                        _uiInfos.Add(new UIInfo { Type = type.FullName, File = asm.CodeBase });
-                    }
-                }
-            }
-
-            Assembly entryAsm = Assembly.GetEntryAssembly();
-            foreach (var type in entryAsm.GetTypes())
-            {
-                if (type.FindInterfaces((i, c) => i.FullName == iuiFullName, null).Length > 0)
-                {
-                    _uiInfos.Add(new UIInfo { Type = type.FullName, File = entryAsm.CodeBase });
-                }
-            }
-        }
-
-        private List<string> GetUIAssemblies()
-        {
-            List<string> asms = new List<string>();
-
-            string baseDirPath = AppDomain.CurrentDomain.BaseDirectory;
-            string uisDirPath = Path.Combine(baseDirPath, "UIs");
-
-            if (Directory.Exists(uisDirPath))
-                asms.AddRange(Directory.GetFiles(uisDirPath, "*.dll", SearchOption.TopDirectoryOnly));
-
-            asms.AddRange(Directory.GetFiles(baseDirPath, "*.ui.dll", SearchOption.TopDirectoryOnly));
-
-            return asms;
         }
 
         private void SetReflectionOnlyAssemblyResolve()

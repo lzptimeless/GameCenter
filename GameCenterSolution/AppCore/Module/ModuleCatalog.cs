@@ -138,7 +138,7 @@ namespace AppCore
             List<string> asms = new List<string>();
 
             string baseDirPath = AppDomain.CurrentDomain.BaseDirectory;
-            string imodulesDirPath = Path.Combine(baseDirPath, "ModuleInterfaces");
+            string imodulesDirPath = Path.Combine(baseDirPath, "Interfaces");
 
             if (Directory.Exists(imodulesDirPath))
                 asms.AddRange(Directory.GetFiles(imodulesDirPath, "*.dll", SearchOption.TopDirectoryOnly));

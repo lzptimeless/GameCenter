@@ -42,13 +42,13 @@ namespace AppCore
             }
         }
 
-        internal void LoadModules()
+        internal void Load()
         {
             _catalog.Initialize();
             CreateModules(_catalog.Items);
         }
 
-        internal void ReleaseModules()
+        internal void Release()
         {
             var modules = _container.GetModules();
             modules = modules.Reverse().ToArray();

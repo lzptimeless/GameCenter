@@ -41,21 +41,22 @@ namespace AppCore
             var uiManager = new UIManager();
             UIManager = uiManager;
 
-            uiManager.LoadUIs();
+            uiManager.Load();
 
             var moduleManager = new ModuleManager();
             ModuleManager = moduleManager;
+            
+            moduleManager.Load();
 
-            uiManager.PreInitializeModule(moduleManager);
-            moduleManager.LoadModules();
+            uiManager.StartWork();
         }
 
         public void Shutdown()
         {
             var moduleManager = ModuleManager as ModuleManager;
-            moduleManager.ReleaseModules();
+            moduleManager.Release();
 
-            UIManager.ReleaseUIs();
+            UIManager.Release();
 
             var fileLogger = Logger as FileLogger;
             fileLogger.Dispose();

@@ -125,6 +125,7 @@
   <ItemGroup>
     <Compile Include="Models\CleanerLogItem.cs" />
     <Compile Include="Models\CleanerLogItemParents.cs" />
+    <Compile Include="Models\CleanerLogItemTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

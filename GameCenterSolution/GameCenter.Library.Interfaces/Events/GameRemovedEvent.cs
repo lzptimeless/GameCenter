@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace GameCenter.Library
 {
-    public class GameAddedEvent : PubSubEvent<GameAddedEventData>
+    public class GameRemovedEvent : PubSubEvent<GameRemovedEventData>
     {
     }
 
-    public class GameAddedEventData : EventData
+    public class GameRemovedEventData : EventData
     {
-        public GameAddedEventData(Game game)
+        public GameRemovedEventData(Game game)
         {
             Game = game;
         }

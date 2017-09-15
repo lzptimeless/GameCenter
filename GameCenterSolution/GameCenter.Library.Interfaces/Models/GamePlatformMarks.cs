@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace GameCenter.Library
 {
-    public class Game
+    public enum GamePlatformMarks
     {
-        public string Name { get; set; }
+        Self,
+        BattleNet,
+        Steam
     }
 }

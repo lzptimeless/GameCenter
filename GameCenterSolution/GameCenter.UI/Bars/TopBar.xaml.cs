@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AppCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,16 +14,24 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace GameCenter.UI
+namespace GameCenter.UI.Bars
 {
     /// <summary>
-    /// Interaction logic for Home.xaml
+    /// Interaction logic for TopBar.xaml
     /// </summary>
-    public partial class Home : UserControl
+    public partial class TopBar : UserControl, IBar
     {
-        public Home()
+        public TopBar()
         {
             InitializeComponent();
+        }
+
+        public void Initialize()
+        {
+        }
+
+        public void Release()
+        {
         }
     }
 }

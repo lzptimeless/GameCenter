@@ -49,10 +49,22 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Fixed.xaml.cs">
-      <DependentUpon>Fixed.xaml</DependentUpon>
+    <Compile Include="Bars\BottomBar.xaml.cs">
+      <DependentUpon>BottomBar.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Home.xaml.cs">
+    <Compile Include="Bars\CaptionBar.xaml.cs">
+      <DependentUpon>CaptionBar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Bars\LeftBar.xaml.cs">
+      <DependentUpon>LeftBar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Bars\RightBar.xaml.cs">
+      <DependentUpon>RightBar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Bars\TopBar.xaml.cs">
+      <DependentUpon>TopBar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Home.xaml.cs">
       <DependentUpon>Home.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -82,11 +94,27 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Fixed.xaml">
+    <Page Include="Bars\BottomBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Home.xaml">
+    <Page Include="Bars\CaptionBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Bars\LeftBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Bars\RightBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Bars\TopBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Home.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -96,8 +124,14 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="PageModels\" />
-    <Folder Include="Pages\" />
+    <ProjectReference Include="..\AppCore\AppCore.csproj">
+      <Project>{F37740D6-A6D1-42B0-94CC-1B522076384A}</Project>
+      <Name>AppCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GameCenter.Library.Interfaces\GameCenter.Library.Interfaces.csproj">
+      <Project>{D88D15E0-5A8F-46D8-BA75-63C74A711C19}</Project>
+      <Name>GameCenter.Library.Interfaces</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

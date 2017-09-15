@@ -42,8 +42,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Events\GameAddedEvent.cs" />
-    <Compile Include="Game.cs" />
+    <Compile Include="Events\GameRemovedEvent.cs" />
+    <Compile Include="Events\GameUpdatedEvent.cs" />
+    <Compile Include="Models\BattleNetGameID.cs" />
+    <Compile Include="Models\BattleNetGameInfo.cs" />
+    <Compile Include="Models\Game.cs" />
+    <Compile Include="Models\GameCover.cs" />
     <Compile Include="ILibrary.cs" />
+    <Compile Include="Models\GameID.cs" />
+    <Compile Include="Models\GamePlatformMarks.cs" />
+    <Compile Include="Models\PlatformGameInfo.cs" />
+    <Compile Include="Models\SelfGameID.cs" />
+    <Compile Include="Models\SelfGameInfo.cs" />
+    <Compile Include="Models\SteamGameID.cs" />
+    <Compile Include="Models\SteamGameInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -54,11 +66,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if not exist "$(SolutionDir)TestConsole\$(OutDir)ModuleInterfaces" md "$(SolutionDir)TestConsole\$(OutDir)ModuleInterfaces"
-copy "$(TargetPath)" "$(SolutionDir)TestConsole\$(OutDir)ModuleInterfaces"
+    <PostBuildEvent>if not exist "$(SolutionDir)TestConsole\$(OutDir)Interfaces" md "$(SolutionDir)TestConsole\$(OutDir)Interfaces"
+copy "$(TargetPath)" "$(SolutionDir)TestConsole\$(OutDir)Interfaces"
 
-if not exist "$(SolutionDir)AppShell\$(OutDir)ModuleInterfaces" md "$(SolutionDir)AppShell\$(OutDir)ModuleInterfaces"
-copy "$(TargetPath)" "$(SolutionDir)AppShell\$(OutDir)ModuleInterfaces"</PostBuildEvent>
+if not exist "$(SolutionDir)AppShell\$(OutDir)Interfaces" md "$(SolutionDir)AppShell\$(OutDir)Interfaces"
+copy "$(TargetPath)" "$(SolutionDir)AppShell\$(OutDir)Interfaces"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

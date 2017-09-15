@@ -5,13 +5,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AppShell"
         mc:Ignorable="d"
-        Title="游戏中心" Height="650" Width="950">
+        Title="游戏中心" Height="650" Width="950"
+        Icon="/AppIcon.png">
     <Grid>
         <!--页面层-->
-        <ContentControl x:Name="PageHost"/>
-        <!--固定元素层-->
-        <Grid>
-            
+        <Grid x:Name="PageLayer">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <ContentControl x:Name="PageHost" Grid.Row="1" Grid.Column="1"/>
         </Grid>
         <!--弹出层-->
         <Grid x:Name="PopupLayer">

@@ -11,39 +11,27 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace AppShell
+namespace GameCenter.UI.Bars
 {
     /// <summary>
-    /// Interaction logic for Shell.xaml
+    /// Interaction logic for RightBar.xaml
     /// </summary>
-    public partial class Shell : Window, IGUI
+    public partial class RightBar : UserControl, IBar
     {
-        public Shell()
+        public RightBar()
         {
             InitializeComponent();
         }
 
         public void Initialize()
         {
-            Application.Current.MainWindow = this;
-            Show();
-        }
-
-        public void Navigate(Type pageInterfaceType, NavigationParameters parameters)
-        {
-            
-        }
-
-        public void PreInitializeModule(IModuleManager moduleManager)
-        {
-            
         }
 
         public void Release()
         {
-            
         }
     }
 }
