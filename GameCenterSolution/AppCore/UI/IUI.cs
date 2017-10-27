@@ -9,8 +9,13 @@ namespace AppCore
     /// <summary>
     /// GUI接口，代表一个用户操作界面集合
     /// </summary>
-    public interface IGUI : IPageJournalCollection
+    public interface IUI
     {
+        /// <summary>
+        /// 页面集合
+        /// </summary>
+        IPageJournalCollection PageJournals { get; }
+
         /// <summary>
         /// 初始化UI
         /// </summary>

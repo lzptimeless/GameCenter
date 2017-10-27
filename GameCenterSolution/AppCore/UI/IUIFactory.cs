@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace AppCore
 {
-    internal interface IGUIFactory
+    internal interface IUIFactory
     {
-        ISplashScreen CreateSplashScreen();
         IBar CreateCaptionBar();
         IBar CreateTopBar();
         IBar CreateBottomBar();

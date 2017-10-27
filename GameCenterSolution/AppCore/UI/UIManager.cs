@@ -14,26 +14,49 @@ namespace AppCore
         {
         }
 
-        private IGUI _gui;
+        private IUI _ui;
         private ISplashScreen _splashScreen;
-        private IGUIFactory _guiFactory;
+        private IBar _captionBar;
+        private IBar _topBar;
+        private IBar _bottomBar;
+        private IBar _leftBar;
+        private IBar _rightBar;
+        private IUIFactory _uiFactory;
         private INavigator _navigator;
 
         internal void Load()
         {
-            SetReflectionOnlyAssemblyResolve();
-            LoadGUI();
-            ClearReflectionOnlyAssemblyResolve();
+            string iuiFullName = typeof(IUI).FullName;
+            string isplashScreenFullName = typeof(ISplashScreen).FullName;
+            Type uiType = null, splashScreenType = null;
+            foreach (var type in Assembly.GetEntryAssembly().GetTypes())
+            {
+                if (type.FindInterfaces((i, c) => i.FullName == iuiFullName, null).Length > 0)
+                    uiType = type;
+                else if (type.FindInterfaces((i, c) => i.FullName == isplashScreenFullName, null).Length > 0)
+                    splashScreenType = type;
+
+                if (uiType != null && splashScreenType != null) break;
+            }
+
+            if (uiType == null) throw new InvalidOperationException("Can not found IUI.");
+
+            _ui = Activator.CreateInstance(uiType) as IUI;
+
+            if (splashScreenType != null) _splashScreen = Activator.CreateInstance(splashScreenType) as ISplashScreen;
+            _ui.Initialize(_splashScreen);
+
+            var uiFactory = new UIFactory();
+            uiFactory.Load();
+            _uiFactory = uiFactory;
+
+            _navigator = new Navigator(_ui.PageJournals, _uiFactory);
         }
 
         internal void StartWork()
         {
-            // 加载边栏
-            LoadBars();
-            // 加载导航器
-            LoadNavigator();
             // 进入工作页面
-            _gui.GoWorkplace();
+            _ui.GoWorkplace();
             // 启动画面已经不需要了，释放掉
             if (_splashScreen != null)
             {
@@ -41,20 +64,23 @@ namespace AppCore
                 _splashScreen = null;
             }
             // 设置各个边栏
-            var captionBar = _guiFactory.CreateCaptionBar();
-            var topBar = _guiFactory.CreateTopBar();
-            var bottomBar = _guiFactory.CreateBottomBar();
-            var leftBar = _guiFactory.CreateLeftBar();
-            var rightBar = _guiFactory.CreateRightBar();
-            _gui.SetBars(captionBar, topBar, bottomBar, leftBar, rightBar);
+            _captionBar = _uiFactory.CreateCaptionBar();
+            _topBar = _uiFactory.CreateTopBar();
+            _bottomBar = _uiFactory.CreateBottomBar();
+            _leftBar = _uiFactory.CreateLeftBar();
+            _rightBar = _uiFactory.CreateRightBar();
+            _ui.SetBars(_captionBar, _topBar, _bottomBar, _leftBar, _rightBar);
             // 加载Home页面
             _navigator.Home();
         }
 
         internal void Release()
         {
-            if (_gui.Count > 0) _gui.RemovePage(0, _gui.Count);
-
+            if (_splashScreen != null)
+            {
+                _splashScreen.Release();
+                _splashScreen = null;
+            }
             if (_captionBar != null)
             {
                 _captionBar.Release();
@@ -80,85 +106,11 @@ namespace AppCore
                 _rightBar.Release();
                 _rightBar = null;
             }
-            if (_gui != null)
+            if (_ui != null)
             {
-                _gui.Release();
-                _gui = null;
+                _ui.Release();
+                _ui = null;
             }
-        }
-
-        private void LoadSplashScreen()
-        {
-            List<string> uiPaths = new List<string>();
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            string uiDir = Path.Combine(baseDir, "UIs");
-
-            if (Directory.Exists(uiDir))
-                uiPaths.AddRange(Directory.GetFiles(uiDir, "*.dll"));
-
-            uiPaths.AddRange(Directory.GetFiles(baseDir, "*.ui.dll"));
-
-            foreach (var asmPath in uiPaths)
-            {
-                Assembly asm = Assembly.ReflectionOnlyLoadFrom(asmPath);
-            }
-        }
-
-        private void LoadGUI()
-        {
-            string iguiFullName = typeof(IGUI).FullName;
-            Type guiType = null;
-            foreach (var type in Assembly.GetEntryAssembly().GetTypes())
-            {
-                if (type.FindInterfaces((i, c) => i.FullName == iguiFullName, null).Length > 0)
-                {
-                    guiType = type;
-                    break;
-                }
-            }
-
-            if (guiType == null) throw new InvalidOperationException("Can not found IGUI.");
-
-            // 创建UI
-            IGUI gui = Activator.CreateInstance(guiType) as IGUI;
-            // 初始化UI
-            gui.Initialize(_splashScreen);
-            _gui = gui;
-        }
-
-        private void LoadBars()
-        { }
-
-        private void LoadNavigator()
-        {
-
-        }
-
-        private Assembly GetOrLoadAssembly(string codeBase)
-        {
-            Assembly asm = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.CodeBase == codeBase);
-            if (asm == null)
-            {
-                asm = Assembly.LoadFrom(codeBase);
-            }
-
-            return asm;
-        }
-
-        private void SetReflectionOnlyAssemblyResolve()
-        {
-            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
-        }
-
-        private void ClearReflectionOnlyAssemblyResolve()
-        {
-            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= CurrentDomain_ReflectionOnlyAssemblyResolve;
-        }
-
-        private Assembly CurrentDomain_ReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            Assembly asm = Assembly.ReflectionOnlyLoad(args.Name);
-            return asm;
         }
     }
 }

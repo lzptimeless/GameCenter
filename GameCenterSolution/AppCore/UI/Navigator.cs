@@ -8,14 +8,14 @@ namespace AppCore
 {
     public class Navigator : INavigator
     {
-        internal Navigator(IPageJournalCollection pageJournalCollection, IGUIFactory guiFactory)
+        internal Navigator(IPageJournalCollection pageJournalCollection, IUIFactory guiFactory)
         {
             _pageJournalCollection = pageJournalCollection;
             _guiFactory = guiFactory;
         }
 
         private IPageJournalCollection _pageJournalCollection;
-        private IGUIFactory _guiFactory;
+        private IUIFactory _guiFactory;
 
         public int CanBackCount
         {

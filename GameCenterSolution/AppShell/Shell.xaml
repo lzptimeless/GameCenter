@@ -12,6 +12,7 @@
         <Grid x:Name="PageLayer">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -20,12 +21,17 @@
                 <ColumnDefinition/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <ContentControl x:Name="PageHost" Grid.Row="1" Grid.Column="1"/>
+            <ContentControl x:Name="CaptionBarHost" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"/>
+            <ContentControl x:Name="TopBarHost" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"/>
+            <ContentControl x:Name="BottomBarHost" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"/>
+            <ContentControl x:Name="LeftBarHost" Grid.Row="2" Grid.Column="0"/>
+            <ContentControl x:Name="RightBarHost" Grid.Row="2" Grid.Column="2"/>
+            <ContentControl x:Name="PageHost" Grid.Row="2" Grid.Column="1"/>
         </Grid>
         <!--弹出层-->
-        <Grid x:Name="PopupLayer">
+        <Grid x:Name="PopupLayer" Visibility="Collapsed">
             <!--弹出层背景-->
-            <Border x:Name="PopupBackground"></Border>
+            <Border x:Name="PopupBackground" Background="Black" Opacity="0.2"></Border>
             <!--对话框-->
         </Grid>
     </Grid>

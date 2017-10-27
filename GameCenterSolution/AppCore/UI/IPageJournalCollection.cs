@@ -9,10 +9,10 @@ namespace AppCore
     /// <summary>
     /// 导航记录集合，记录了导航页面和它的参数
     /// </summary>
-    internal interface IPageJournalCollection : IReadOnlyCollection<PageJournalEntry>, IEnumerable<PageJournalEntry>
+    public interface IPageJournalCollection : IReadOnlyCollection<PageJournalEntry>, IEnumerable<PageJournalEntry>
     {
         /// <summary>
-        /// 获取或设置激活的页面索引（当前页面索引）
+        /// 获取或设置激活的页面索引（当前页面索引）,默认值为-1（显示空白页面）
         /// </summary>
         int ActiveIndex { get; set; }
 

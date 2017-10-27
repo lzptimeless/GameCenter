@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace GameCenter.UI
+namespace AppShell
 {
     /// <summary>
     /// Interaction logic for SplashScreen.xaml

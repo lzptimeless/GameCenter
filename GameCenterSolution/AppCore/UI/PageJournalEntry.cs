@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AppCore
 {
-    internal class PageJournalEntry
+    public class PageJournalEntry
     {
         public PageJournalEntry(IPage page, NavigationParameters parameters)
         {

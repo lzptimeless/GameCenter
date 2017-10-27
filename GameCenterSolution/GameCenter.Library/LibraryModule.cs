@@ -94,7 +94,7 @@ namespace GameCenter.Library
             if (Interlocked.CompareExchange(ref _scanToken, newToken, null) != null)
             {
                 // 正在扫描，直接退出
-                newToken.Cancel();
+                newToken.Dispose();
                 return;
             }
 
