@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace GameCenter.Library
 {
-    public abstract class PlatformGameInfo
+    public enum GamePlatformFlags
     {
-        public abstract GamePlatformFlags PlatformFlag { get; }
-
-        public abstract PlatformGameInfo DeepClone();
+        Isolation,
+        BattleNet,
+        Steam
     }
 }

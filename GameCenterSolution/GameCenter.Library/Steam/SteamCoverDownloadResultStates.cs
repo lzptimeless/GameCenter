@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace GameCenter.Library
 {
-    public enum GamePlatformMarks
+    internal enum SteamCoverDownloadResultStates
     {
-        Self,
-        BattleNet,
-        Steam
+        Successed,
+        Failed,
+        Cancelled
     }
 }

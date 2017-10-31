@@ -8,9 +8,9 @@ namespace GameCenter.Library
 {
     public class BattleNetGameInfo : PlatformGameInfo
     {
-        public override GamePlatformMarks Mark
+        public override GamePlatformFlags PlatformFlag
         {
-            get { return GamePlatformMarks.BattleNet; }
+            get { return GamePlatformFlags.BattleNet; }
         }
 
         public string Name { get; set; }

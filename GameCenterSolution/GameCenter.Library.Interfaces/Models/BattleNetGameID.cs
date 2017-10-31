@@ -13,16 +13,16 @@ namespace GameCenter.Library
             Name = name;
         }
 
-        public override GamePlatformMarks PlatformMark
+        public override GamePlatformFlags PlatformFlag
         {
-            get { return GamePlatformMarks.BattleNet; }
+            get { return GamePlatformFlags.BattleNet; }
         }
 
         public string Name { get; private set; }
 
         public override string ToString()
         {
-            return $"GameID: {PlatformMark}, {Name}";
+            return $"GameID: {PlatformFlag}, {Name}";
         }
 
         public override GameID DeepClone()

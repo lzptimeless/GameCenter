@@ -10,7 +10,7 @@ namespace GameCenter.Library
     {
         public string Icon { get; set; }
         public string Small { get; set; }
-        public string Midsize { get; set; }
+        public string Normal { get; set; }
         public string Full { get; set; }
 
         public GameCover DeepClone()

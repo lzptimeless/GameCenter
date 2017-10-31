@@ -8,7 +8,7 @@ namespace GameCenter.Library
 {
     public abstract class GameID : IEquatable<GameID>
     {
-        public abstract GamePlatformMarks PlatformMark { get; }
+        public abstract GamePlatformFlags PlatformFlag { get; }
 
         public abstract GameID DeepClone();
 
@@ -18,7 +18,7 @@ namespace GameCenter.Library
 
         public override string ToString()
         {
-            return $"GameID: {PlatformMark}";
+            return $"GameID: {PlatformFlag}";
         }
 
         public override int GetHashCode()

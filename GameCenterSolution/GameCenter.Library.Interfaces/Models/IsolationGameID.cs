@@ -6,28 +6,28 @@ using System.Threading.Tasks;
 
 namespace GameCenter.Library
 {
-    public class SelfGameID : GameID
+    public class IsolationGameID : GameID
     {
-        public SelfGameID(string launcher)
+        public IsolationGameID(string launcher)
         {
             Launcher = launcher;
         }
 
-        public override GamePlatformMarks PlatformMark
+        public override GamePlatformFlags PlatformFlag
         {
-            get { return GamePlatformMarks.Self; }
+            get { return GamePlatformFlags.Isolation; }
         }
 
         public string Launcher { get; private set; }
 
         public override string ToString()
         {
-            return $"GameID: {PlatformMark}, {Launcher}";
+            return $"GameID: {PlatformFlag}, {Launcher}";
         }
 
         public override GameID DeepClone()
         {
-            SelfGameID clone = MemberwiseClone() as SelfGameID;
+            IsolationGameID clone = MemberwiseClone() as IsolationGameID;
 
             return clone;
         }
@@ -39,7 +39,7 @@ namespace GameCenter.Library
 
         protected override bool InnerEquals(GameID other)
         {
-            SelfGameID other1 = other as SelfGameID;
+            IsolationGameID other1 = other as IsolationGameID;
             if (object.ReferenceEquals(other1, null)) return false;
 
             return string.Equals(other1.Launcher, Launcher, StringComparison.OrdinalIgnoreCase);

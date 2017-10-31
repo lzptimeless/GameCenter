@@ -8,9 +8,9 @@ namespace GameCenter.Library
 {
     public class SteamGameInfo : PlatformGameInfo
     {
-        public override GamePlatformMarks Mark
+        public override GamePlatformFlags PlatformFlag
         {
-            get { return GamePlatformMarks.Steam; }
+            get { return GamePlatformFlags.Steam; }
         }
 
         public Int64 AppID { get; set; }

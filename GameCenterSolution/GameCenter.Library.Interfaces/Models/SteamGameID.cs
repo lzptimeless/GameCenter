@@ -13,16 +13,16 @@ namespace GameCenter.Library
             AppID = appID;
         }
 
-        public override GamePlatformMarks PlatformMark
+        public override GamePlatformFlags PlatformFlag
         {
-            get { return GamePlatformMarks.Steam; }
+            get { return GamePlatformFlags.Steam; }
         }
 
         public Int64 AppID { get; private set; }
 
         public override string ToString()
         {
-            return $"GameID: {PlatformMark}, {AppID}";
+            return $"GameID: {PlatformFlag}, {AppID}";
         }
 
         public override GameID DeepClone()

@@ -50,10 +50,10 @@
     <Compile Include="Models\GameCover.cs" />
     <Compile Include="ILibrary.cs" />
     <Compile Include="Models\GameID.cs" />
-    <Compile Include="Models\GamePlatformMarks.cs" />
+    <Compile Include="Models\GamePlatformFlags.cs" />
     <Compile Include="Models\PlatformGameInfo.cs" />
-    <Compile Include="Models\SelfGameID.cs" />
-    <Compile Include="Models\SelfGameInfo.cs" />
+    <Compile Include="Models\IsolationGameID.cs" />
+    <Compile Include="Models\IsolationGameInfo.cs" />
     <Compile Include="Models\SteamGameID.cs" />
     <Compile Include="Models\SteamGameInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

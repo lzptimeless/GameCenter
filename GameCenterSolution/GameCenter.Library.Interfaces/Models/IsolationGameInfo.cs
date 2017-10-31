@@ -6,18 +6,18 @@ using System.Threading.Tasks;
 
 namespace GameCenter.Library
 {
-    public class SelfGameInfo : PlatformGameInfo
+    public class IsolationGameInfo : PlatformGameInfo
     {
-        public override GamePlatformMarks Mark
+        public override GamePlatformFlags PlatformFlag
         {
-            get { return GamePlatformMarks.Self; }
+            get { return GamePlatformFlags.Isolation; }
         }
 
         public string Launcher { get; set; }
 
         public override PlatformGameInfo DeepClone()
         {
-            SelfGameInfo clone = MemberwiseClone() as SelfGameInfo;
+            IsolationGameInfo clone = MemberwiseClone() as IsolationGameInfo;
 
             return clone;
         }
