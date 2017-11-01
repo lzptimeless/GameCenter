@@ -44,6 +44,7 @@
     <Compile Include="Events\GameAddedEvent.cs" />
     <Compile Include="Events\GameRemovedEvent.cs" />
     <Compile Include="Events\GameUpdatedEvent.cs" />
+    <Compile Include="Exceptions\GameAlreadyExistsException.cs" />
     <Compile Include="Models\BattleNetGameID.cs" />
     <Compile Include="Models\BattleNetGameInfo.cs" />
     <Compile Include="Models\Game.cs" />

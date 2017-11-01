@@ -11,7 +11,11 @@ namespace GameCenter.Library
     {
         GamePlatformFlags PlatformFlag { get; }
 
-        void Scan(CancellationToken ct);
-        void Launch(GameID id);
+        event EventHandler<GameAddedEventData> GameAdded;
+        event EventHandler<GameRemovedEventData> GameRemoved;
+        event EventHandler<GameUpdatedEventData> GameUpdated;
+
+        Task ScanAsync(CancellationToken ct);
+        Task LaunchAsync(GameID id);
     }
 }

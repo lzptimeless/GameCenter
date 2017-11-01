@@ -10,6 +10,8 @@ namespace AppCore
     {
         ILogger Logger { get; }
 
+        CoreConfig Config { get; }
+
         IModuleManager ModuleManager { get; }
 
         void Run();

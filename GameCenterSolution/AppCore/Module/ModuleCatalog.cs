@@ -137,11 +137,20 @@ namespace AppCore
         {
             List<string> asms = new List<string>();
 
+            string interfaceDirPath;
             string baseDirPath = AppDomain.CurrentDomain.BaseDirectory;
-            string imodulesDirPath = Path.Combine(baseDirPath, "Interfaces");
+            string configInterfaceFolder = Core.Instance.Config.InterfaceFolder;
+            if (Path.IsPathRooted(configInterfaceFolder))
+            {
+                interfaceDirPath = configInterfaceFolder;
+            }
+            else
+            {
+                interfaceDirPath = Path.Combine(baseDirPath, configInterfaceFolder);
+            }
 
-            if (Directory.Exists(imodulesDirPath))
-                asms.AddRange(Directory.GetFiles(imodulesDirPath, "*.dll", SearchOption.TopDirectoryOnly));
+            if (Directory.Exists(interfaceDirPath))
+                asms.AddRange(Directory.GetFiles(interfaceDirPath, "*.dll", SearchOption.TopDirectoryOnly));
 
             asms.AddRange(Directory.GetFiles(baseDirPath, "*.interface.dll", SearchOption.TopDirectoryOnly));
 
@@ -152,8 +161,17 @@ namespace AppCore
         {
             List<string> asms = new List<string>();
 
+            string modulesDirPath;
             string baseDirPath = AppDomain.CurrentDomain.BaseDirectory;
-            string modulesDirPath = Path.Combine(baseDirPath, "Modules");
+            string configModuleFolder = Core.Instance.Config.ModuleFolder;
+            if (Path.IsPathRooted(configModuleFolder))
+            {
+                modulesDirPath = configModuleFolder;
+            }
+            else
+            {
+                modulesDirPath = Path.Combine(baseDirPath, configModuleFolder);
+            }
 
             if (Directory.Exists(modulesDirPath))
                 asms.AddRange(Directory.GetFiles(modulesDirPath, "*.dll", SearchOption.TopDirectoryOnly));

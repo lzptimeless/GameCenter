@@ -38,8 +38,9 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App\Core.cs" />
-    <Compile Include="App\ICore.cs" />
+    <Compile Include="Core\Core.cs" />
+    <Compile Include="Core\CoreConfig.cs" />
+    <Compile Include="Core\ICore.cs" />
     <Compile Include="Common\ListDictionary.cs" />
     <Compile Include="Common\StringNullOrEmptyException.cs" />
     <Compile Include="Configuration\ConfigBase.cs" />

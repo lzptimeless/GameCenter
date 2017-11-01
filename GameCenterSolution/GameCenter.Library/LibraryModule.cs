@@ -18,22 +18,41 @@ namespace GameCenter.Library
     {
         public LibraryModule()
         {
+            _syncObj = new object();
             // 初始化事件管理器
             _eventAggregator = new ModuleEventAggregator();
-            _games = new List<Game>();
-            _libraryProviders = new List<ILibraryProvider>();
-            _libraryProviders.Add(new IsolationLibraryProvider());
-            _libraryProviders.Add(new SteamLibraryProvider());
+            // 游戏集合
+            _games = new GameCollection();
+            // 初始化支持的游戏平台
+            _libraryProviders = new LibraryProviderCollection();
             _libraryProviders.Add(new BattleNetLibraryProvider());
+            _libraryProviders.Add(new SteamLibraryProvider());
+            _libraryProviders.Add(new IsolationLibraryProvider());
+            foreach (var lp in _libraryProviders)
+            {
+                lp.GameAdded += LibraryProvider_GameAdded;
+                lp.GameRemoved += LibraryProvider_GameRemoved;
+                lp.GameUpdated += LibraryProvider_GameUpdated;
+            }
         }
 
+        private readonly object _syncObj;
         /// <summary>
         /// 定义这个模块的事件管理器，用来集中管理这个模块的所有事件
         /// </summary>
         private IModuleEventAggregator _eventAggregator;
-        private List<Game> _games;
+        /// <summary>
+        /// 游戏集合
+        /// </summary>
+        private GameCollection _games;
+        /// <summary>
+        /// 取消游戏扫描的Token
+        /// </summary>
         private CancellationTokenSource _scanToken;
-        private List<ILibraryProvider> _libraryProviders;
+        /// <summary>
+        /// 支持的游戏平台集合
+        /// </summary>
+        private LibraryProviderCollection _libraryProviders;
 
         /// <summary>
         /// 利用事件管理器实现<see cref="ILibrary.GameAddedEvent"/>，这个事件继承自
@@ -93,23 +112,33 @@ namespace GameCenter.Library
             _eventAggregator.Unsubscribe(target);
         }
 
-        public void StartScan()
+        public async void StartScan()
         {
             CancellationTokenSource newToken = new CancellationTokenSource();
             if (Interlocked.CompareExchange(ref _scanToken, newToken, null) != null)
             {
-                // 正在扫描，直接退出
+                // 其他线程正在扫描，直接退出
                 newToken.Dispose();
                 return;
             }
 
-            ThreadPool.QueueUserWorkItem(s =>
+            try
             {
                 foreach (var lp in _libraryProviders)
                 {
-                    lp.Scan(newToken.Token);
+                    await lp.ScanAsync(newToken.Token);
                 }
-            });
+            }
+            catch (OperationCanceledException)
+            {
+                // 扫描被取消
+            }
+            finally
+            {
+                // 释放并重置取消Token
+                newToken.Dispose();
+                Interlocked.CompareExchange(ref _scanToken, null, newToken);
+            }
         }
 
         public void StopScan()
@@ -119,17 +148,14 @@ namespace GameCenter.Library
             {
                 token.Cancel();
             }
-
-            Interlocked.CompareExchange(ref _scanToken, null, token);
         }
 
         public List<Game> GetGames()
         {
-            List<Game> items = null;
-
+            List<Game> items;
             lock (_games)
             {
-                items = _games.Select(g => g.DeepClone()).ToList();
+                items = _games.CloneToList();
             }
 
             return items;
@@ -139,12 +165,49 @@ namespace GameCenter.Library
         {
             if (id == null) throw new ArgumentNullException("id");
 
-            var libraryProvider = _libraryProviders.FirstOrDefault(p => p.PlatformFlag == id.PlatformFlag);
+            var libraryProvider = _libraryProviders[id.PlatformFlag];
 
             if (libraryProvider == null)
                 throw new InvalidOperationException($"Unspported platform({id.PlatformFlag})");
 
-            libraryProvider.Launch(id);
+            var task = libraryProvider.LaunchAsync(id);
+        }
+
+        private void LibraryProvider_GameAdded(object sender, GameAddedEventData e)
+        {
+            bool isAdded = false;
+            lock (_syncObj)
+            {
+                isAdded = _games.Add(e.Game.DeepClone(), true);
+            }
+
+            if (isAdded) GameAddedEvent.Publish(e);
+        }
+
+        private void LibraryProvider_GameRemoved(object sender, GameRemovedEventData e)
+        {
+            bool isRemoved = false;
+            lock (_syncObj)
+            {
+                isRemoved = _games.Remove(e.Game);
+            }
+
+            if (isRemoved) GameRemovedEvent.Publish(e);
+        }
+
+        private void LibraryProvider_GameUpdated(object sender, GameUpdatedEventData e)
+        {
+            bool isUpdate = false;
+            lock (_syncObj)
+            {
+                if (_games.Contains(e.Game.ID))
+                {
+                    isUpdate = true;
+                    _games[e.Game.ID] = e.Game.DeepClone();
+                }
+            }
+
+            if (isUpdate) GameUpdatedEvent.Publish(e);
         }
     }
 }

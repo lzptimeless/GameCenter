@@ -15,13 +15,13 @@ namespace GameCenter.Library
         public SteamLibraryProvider()
         {
             _syncObj = new object();
-            _games = new List<Game>();
+            _games = new GameCollection();
             _coverDownloader = new SteamCoverDownloader();
             _coverDownloader.Downloaded += _coverDownloader_Downloaded;
         }
 
         private readonly object _syncObj;
-        private List<Game> _games;
+        private GameCollection _games;
         private SteamCoverDownloader _coverDownloader;
 
         public GamePlatformFlags PlatformFlag
@@ -51,62 +51,79 @@ namespace GameCenter.Library
         }
 
 
-        public void Scan(CancellationToken cancelToken)
+        public Task ScanAsync(CancellationToken cancelToken)
         {
-            string steamDirectory = null;
-            // Find steam
-            using (RegistryKey steamKey = Open64And32NodeOnRead(RegistryHive.LocalMachine, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam"))
+            return Task.Run(() =>
             {
-                if (steamKey != null)
+                string steamDirectory = null;
+                // 查找Steam安装目录
+                // Find steam install directory
+                using (RegistryKey steamKey = Open64And32NodeOnRead(RegistryHive.LocalMachine, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam"))
                 {
-                    string displayIcon = steamKey.GetValue("DisplayIcon") as string;
-                    if (!string.IsNullOrEmpty(displayIcon))
+                    if (steamKey != null)
                     {
-                        steamDirectory = Path.GetDirectoryName(displayIcon);
+                        string displayIcon = steamKey.GetValue("DisplayIcon") as string;
+                        if (!string.IsNullOrEmpty(displayIcon))
+                        {
+                            steamDirectory = Path.GetDirectoryName(displayIcon);
+                        }
                     }
                 }
-            }
 
-            if (string.IsNullOrEmpty(steamDirectory))
-            {
-                // Not found steam directory.
-                return;
-            }
-
-            // Find games
-            string appsDirectory = Path.Combine(steamDirectory, "steamapps");
-            foreach (var appInfoPath in Directory.EnumerateFiles(appsDirectory, "*.acf"))
-            {
-                Game game = TryParseSteamGame(appInfoPath);
-                if (game != null)
+                if (string.IsNullOrEmpty(steamDirectory))
                 {
-                    lock (_syncObj) _games.Add(game);
-
-                    Int64 steamAppID = (game.ID as SteamGameID).AppID;
-                    _coverDownloader.Download(steamAppID, true);
-
-                    OnGameAdded(game);
+                    // Not found steam directory.
+                    return;
                 }
-            }
+
+                // Find games
+                string appsDirectory = Path.Combine(steamDirectory, "steamapps");
+                foreach (var appInfoPath in Directory.EnumerateFiles(appsDirectory, "*.acf"))
+                {
+                    if (cancelToken.IsCancellationRequested) throw new OperationCanceledException("Scan steam games canceled.");
+
+                    Game game = TryParseSteamGame(appInfoPath);
+                    if (game != null)
+                    {
+                        bool isAdded = false;
+                        lock (_syncObj)
+                        {
+                            isAdded = _games.Add(game, true);
+                            game = game.DeepClone();
+                        }
+
+                        if (isAdded)
+                        {
+                            OnGameAdded(game);
+                            // 请求下载游戏封面
+                            Int64 steamAppID = (game.ID as SteamGameID).AppID;
+                            _coverDownloader.Download(steamAppID, true);
+                        }
+                    }
+                }
+            });// Task.Run
         }
 
-        public void Launch(GameID id)
+        public Task LaunchAsync(GameID id)
         {
             if (id == null) throw new ArgumentNullException("id");
 
-            Game game;
-            lock (_syncObj)
+            return Task.Run(() =>
             {
-                game = _games.FirstOrDefault(g => g.ID == id)?.DeepClone();
-            }
+                Game game;
+                lock (_syncObj)
+                {
+                    game = _games[id]?.DeepClone();
+                }
 
-            if (game == null) throw new InvalidOperationException($"Can not found game:{id}");
+                if (game == null) throw new InvalidOperationException($"Can not found game:{id}");
 
-            SteamGameInfo gameInfo = game.PlatformGameInfo as SteamGameInfo;
-            if (gameInfo == null)
-                throw new ArgumentException($"gameInfo({gameInfo}) can not convert to {typeof(SteamGameInfo).FullName}");
+                SteamGameInfo gameInfo = game.PlatformGameInfo as SteamGameInfo;
+                if (gameInfo == null)
+                    throw new ArgumentException($"gameInfo({gameInfo}) can not convert to {typeof(SteamGameInfo).FullName}");
 
-            System.Diagnostics.Process.Start($"steam://rungameid/{gameInfo.AppID}");
+                System.Diagnostics.Process.Start($"steam://rungameid/{gameInfo.AppID}");
+            });// Task.Run
         }
 
         private void _coverDownloader_Downloaded(object sender, SteamCoverDownloadedArgs e)
@@ -117,11 +134,13 @@ namespace GameCenter.Library
                 Game game;
                 lock (_syncObj)
                 {
-                    game = _games.FirstOrDefault(g => g.ID == gameID);
+                    game = _games[gameID];
                     if (game != null)
                     {
                         game.Cover.Small = e.SmallPath;
                         game.Cover.Normal = e.NormalPath;
+
+                        game = game.DeepClone();
                     }
                 }
 
