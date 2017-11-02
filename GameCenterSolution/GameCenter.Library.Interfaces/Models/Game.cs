@@ -31,5 +31,18 @@ namespace GameCenter.Library
 
             return clone;
         }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            if (!string.IsNullOrEmpty(Name)) sb.Append(Name);
+            if (ID != null)
+            {
+                if (sb.Length > 0) sb.Append(", ");
+                sb.Append(ID);
+            }
+
+            return sb.ToString();
+        }
     }
 }

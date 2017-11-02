@@ -28,6 +28,7 @@ namespace GameCenter.Library
     {
         Name = 0x1,
         Cover = 0x2,
-        PlatformGameInfo = 0x4
+        PlatformGameInfo = 0x4,
+        All = Name | Cover | PlatformGameInfo
     }
 }

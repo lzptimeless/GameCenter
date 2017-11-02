@@ -45,12 +45,14 @@
     <Compile Include="GameCollection.cs" />
     <Compile Include="ILibraryProvider.cs" />
     <Compile Include="Isolation\IsolationLibraryProvider.cs" />
+    <Compile Include="LibraryEnviroment.cs" />
     <Compile Include="LibraryModule.cs" />
     <Compile Include="LibraryProviderCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Steam\SteamCoverDownloadedArgs.cs" />
     <Compile Include="Steam\SteamCoverDownloader.cs" />
     <Compile Include="Steam\SteamCoverDownloadResultStates.cs" />
+    <Compile Include="Steam\SteamLibraryEnviroment.cs" />
     <Compile Include="Steam\SteamLibraryProvider.cs" />
   </ItemGroup>
   <ItemGroup>

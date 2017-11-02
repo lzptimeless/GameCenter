@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -13,10 +14,15 @@ namespace AppCore
         {
             _catalog = new ModuleCatalog();
             _container = new ModuleContainer();
+            _enviroments = new Dictionary<string, ModuleEnviroment>();
         }
 
         private ModuleCatalog _catalog;
         private ModuleContainer _container;
+        /// <summary>
+        /// Key: Module full type name, Value: <see cref="ModuleEnviroment"/>
+        /// </summary>
+        private Dictionary<string, ModuleEnviroment> _enviroments;
 
         public IModule GetModule(Type moduleInterfaceType)
         {
@@ -31,6 +37,16 @@ namespace AppCore
         public IModule[] GetModules()
         {
             return _container.GetModules();
+        }
+
+        public ModuleEnviroment GetModuleEnviroment<TModule>() where TModule : IModule
+        {
+            Type interfaceType = typeof(TModule);
+
+            if (!_enviroments.ContainsKey(interfaceType.FullName))
+                throw new ArgumentException($"Can not found enviroment for {interfaceType.FullName}");
+
+            return _enviroments[interfaceType.FullName];
         }
 
         public void UnsubscribeEvents(object target)
@@ -63,13 +79,23 @@ namespace AppCore
         {
             foreach (var moduleInfo in modules)
             {
+                // 创建模块环境
+                if (!_enviroments.ContainsKey(moduleInfo.InterfaceTypeFullName))
+                {
+                    string userDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                    string appName = Core.Instance.Config.AppName;
+                    string moduleUserDataFolder = Path.Combine(userDataFolder, appName, moduleInfo.TypeName);
+                    ModuleEnviroment moduleEnviroment = new ModuleEnviroment(moduleInfo.AssemblyFullName, moduleUserDataFolder);
+                    _enviroments.Add(moduleInfo.InterfaceTypeFullName, moduleEnviroment);
+                }
+
                 // 加载程序集
                 // Load assembly
                 moduleInfo.State = ModuleStates.LoadingTypes;
-                Assembly moduleInterfaceAsm = GetOrLoadAssembly(moduleInfo.InterfaceFile);
-                Type moduleInterfaceType = moduleInterfaceAsm.GetType(moduleInfo.Interface);
-                Assembly moduleAsm = GetOrLoadAssembly(moduleInfo.File);
-                Type moduleType = moduleAsm.GetType(moduleInfo.Type);
+                Assembly moduleInterfaceAsm = GetOrLoadAssembly(moduleInfo.InterfaceAssemblyCodeBase);
+                Type moduleInterfaceType = moduleInterfaceAsm.GetType(moduleInfo.InterfaceTypeFullName);
+                Assembly moduleAsm = GetOrLoadAssembly(moduleInfo.AssemblyCodeBase);
+                Type moduleType = moduleAsm.GetType(moduleInfo.TypeFullName);
 
                 // 创建模块
                 // Create module

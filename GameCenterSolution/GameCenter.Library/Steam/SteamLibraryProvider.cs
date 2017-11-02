@@ -96,8 +96,11 @@ namespace GameCenter.Library
                         {
                             OnGameAdded(game);
                             // 请求下载游戏封面
-                            Int64 steamAppID = (game.ID as SteamGameID).AppID;
-                            _coverDownloader.Download(steamAppID, true);
+                            if (string.IsNullOrEmpty(game.Cover.Normal))
+                            {
+                                Int64 steamAppID = (game.ID as SteamGameID).AppID;
+                                _coverDownloader.Download(steamAppID, true);
+                            }
                         }
                     }
                 }
@@ -186,6 +189,13 @@ namespace GameCenter.Library
                     }
                 }
             }
+
+            // 获取游戏封面
+            string smallCoverPath = SteamLibraryEnviroment.GetGameSmallCoverPath(appID);
+            if (File.Exists(smallCoverPath)) game.Cover.Small = smallCoverPath;
+
+            string normalCoverPath = SteamLibraryEnviroment.GetGameNormalCoverPath(appID);
+            if (File.Exists(normalCoverPath)) game.Cover.Normal = normalCoverPath;
 
             return game;
         }

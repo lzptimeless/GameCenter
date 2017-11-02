@@ -72,6 +72,7 @@
     <Compile Include="Module\ModularityException.cs" />
     <Compile Include="Module\ModuleCatalog.cs" />
     <Compile Include="Module\ModuleDependencySolver.cs" />
+    <Compile Include="Module\ModuleEnviroment.cs" />
     <Compile Include="Module\ModuleEventAggregator.cs" />
     <Compile Include="Module\ModuleInitializeAttribute.cs" />
     <Compile Include="Module\MultiModuleInterfaceException.cs" />

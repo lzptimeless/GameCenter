@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -52,6 +53,10 @@ namespace AppCore
             if (File.Exists(coreConfigPath)) coreConfig.Load(coreConfigPath);
 
             Config = coreConfig;
+            // 设置程序集解析路径
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
+
             // 加载UI
             var uiManager = new UIManager();
             UIManager = uiManager;
@@ -75,6 +80,74 @@ namespace AppCore
 
             var fileLogger = Logger as FileLogger;
             fileLogger.Dispose();
+        }
+
+        private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            AssemblyName asmName = new AssemblyName(args.Name);
+            Assembly asmExist = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.FullName == args.Name);
+            if (asmExist != null) return asmExist;
+
+            string asmFileName = asmName.Name + ".dll";
+            string interfaceFolderPath = Config.GetInterfaceFolderFullPath();
+            if (!string.IsNullOrEmpty(interfaceFolderPath))
+            {
+                string interfaceFilePath = Path.Combine(interfaceFolderPath, asmFileName);
+
+                if (File.Exists(interfaceFilePath)) return Assembly.LoadFrom(interfaceFilePath);
+            }
+
+            string moduleFolderPath = Config.GetModuleFolderFullPath();
+            if (!string.IsNullOrEmpty(moduleFolderPath))
+            {
+                string moduleFilePath = Path.Combine(moduleFolderPath, asmFileName);
+
+                if (File.Exists(moduleFilePath)) return Assembly.LoadFrom(moduleFilePath);
+            }
+
+            string uiFolderPath = Config.GetUIFolderFullPath();
+            if (!string.IsNullOrEmpty(uiFolderPath))
+            {
+                string uiFilePath = Path.Combine(uiFolderPath, asmFileName);
+
+                if (File.Exists(uiFilePath)) return Assembly.LoadFrom(uiFilePath);
+            }
+
+            return null;
+        }
+
+        private Assembly CurrentDomain_ReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            AssemblyName asmName = new AssemblyName(args.Name);
+            Assembly asmExist = AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies().FirstOrDefault(a => a.FullName == args.Name);
+            if (asmExist != null) return asmExist;
+
+            string asmFileName = asmName.Name + ".dll";
+            string interfaceFolderPath = Config.GetInterfaceFolderFullPath();
+            if (!string.IsNullOrEmpty(interfaceFolderPath))
+            {
+                string interfaceFilePath = Path.Combine(interfaceFolderPath, asmFileName);
+
+                if (File.Exists(interfaceFilePath)) return Assembly.ReflectionOnlyLoadFrom(interfaceFilePath);
+            }
+
+            string moduleFolderPath = Config.GetModuleFolderFullPath();
+            if (!string.IsNullOrEmpty(moduleFolderPath))
+            {
+                string moduleFilePath = Path.Combine(moduleFolderPath, asmFileName);
+
+                if (File.Exists(moduleFilePath)) return Assembly.ReflectionOnlyLoadFrom(moduleFilePath);
+            }
+
+            string uiFolderPath = Config.GetUIFolderFullPath();
+            if (!string.IsNullOrEmpty(uiFolderPath))
+            {
+                string uiFilePath = Path.Combine(uiFolderPath, asmFileName);
+
+                if (File.Exists(uiFilePath)) return Assembly.ReflectionOnlyLoadFrom(uiFilePath);
+            }
+
+            return Assembly.ReflectionOnlyLoad(args.Name);
         }
     }
 }

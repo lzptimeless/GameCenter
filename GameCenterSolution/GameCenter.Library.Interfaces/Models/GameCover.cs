@@ -17,5 +17,15 @@ namespace GameCenter.Library
         {
             return (GameCover)MemberwiseClone();
         }
+
+        public override string ToString()
+        {
+            if (!string.IsNullOrEmpty(Icon)) return $"I:{Icon}";
+            if (!string.IsNullOrEmpty(Small)) return $"S:{Small}";
+            if (!string.IsNullOrEmpty(Normal)) return $"N:{Normal}";
+            if (!string.IsNullOrEmpty(Full)) return $"F:{Full}";
+
+            return "None";
+        }
     }
 }

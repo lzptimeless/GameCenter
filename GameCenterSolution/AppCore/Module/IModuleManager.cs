@@ -31,6 +31,13 @@ namespace AppCore
         IModule[] GetModules();
 
         /// <summary>
+        /// 获取模块运行环境
+        /// </summary>
+        /// <typeparam name="TModule">模块接口类型</typeparam>
+        /// <returns>模块运行环境</returns>
+        ModuleEnviroment GetModuleEnviroment<TModule>() where TModule : IModule;
+
+        /// <summary>
         /// 注销这个对象实例在所有模块中注册过的事件
         /// </summary>
         /// <param name="target">注册过模块事件的对象实例</param>

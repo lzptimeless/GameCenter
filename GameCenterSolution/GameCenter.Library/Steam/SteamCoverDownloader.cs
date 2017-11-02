@@ -253,31 +253,37 @@ namespace GameCenter.Library
             long t = (long)(DateTime.Now - new DateTime(1970, 1, 1)).TotalSeconds;
             string smallUrl = $"http://cdn.steamstatic.com.8686c.com/steam/apps/{appID}/header_292x136.jpg?t={t}";
             string normalUrl = $"http://cdn.steamstatic.com.8686c.com/steam/apps/{appID}/header.jpg?t={t}";
-            string smallPath, normalPath;
+            string smallTmpPath, normalTmpPath;
             // 注册取消操作
             ct.Register(() => client.CancelPendingRequests());
             // 获取小图
             using (var stream = await client.GetStreamAsync(smallUrl))
             {
-                string tmpPath = Path.Combine(Path.GetTempPath(), Path.GetTempFileName(), ".jpg");
+                string tmpPath = Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
                 using (var fileStream = new FileStream(tmpPath, FileMode.Create, FileAccess.Write, FileShare.Read))
                 {
                     await stream.CopyToAsync(fileStream, 81920, ct);
                 }
 
-                smallPath = tmpPath;
+                smallTmpPath = tmpPath;
             }
             // 获取普通大小封面
             using (var stream = await client.GetStreamAsync(normalUrl))
             {
-                string tmpPath = Path.Combine(Path.GetTempPath(), Path.GetTempFileName(), ".jpg");
+                string tmpPath = Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
                 using (var fileStream = new FileStream(tmpPath, FileMode.Create, FileAccess.Write, FileShare.Read))
                 {
                     await stream.CopyToAsync(fileStream, 81920, ct);
                 }
 
-                normalPath = tmpPath;
+                normalTmpPath = tmpPath;
             }
+
+            string coverFolder = SteamLibraryEnviroment.GetGameCoverFolder(true);// 确保文件夹存在
+            string smallPath = SteamLibraryEnviroment.GetGameSmallCoverPath(appID);
+            string normalPath = SteamLibraryEnviroment.GetGameNormalCoverPath(appID);
+            File.Copy(smallTmpPath, smallPath, true);
+            File.Copy(normalTmpPath, normalPath, true);
 
             return new DownloadResult(smallPath, normalPath);
         }

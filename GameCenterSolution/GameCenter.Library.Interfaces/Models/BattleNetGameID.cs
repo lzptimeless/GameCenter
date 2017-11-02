@@ -22,7 +22,7 @@ namespace GameCenter.Library
 
         public override string ToString()
         {
-            return $"GameID: {PlatformFlag}, {Name}";
+            return $"{PlatformFlag}, {Name}";
         }
 
         public override GameID DeepClone()

@@ -18,7 +18,7 @@ namespace GameCenter.Library
 
         public override string ToString()
         {
-            return $"GameID: {PlatformFlag}";
+            return PlatformFlag.ToString();
         }
 
         public override int GetHashCode()

@@ -29,10 +29,11 @@ namespace GameCenter.Library
 
         /// <summary>
         /// 通过<see cref="GameID"/>获取游戏，如果游戏不存在则返回null
-        /// 通过<see cref="GameID"/>修改游戏，如果游戏不存在则添加，存在则修改
+        /// 通过<see cref="GameID"/>修改游戏，如果游戏不存在则抛出异常，存在则修改
         /// </summary>
         /// <param name="id">游戏ID</param>
         /// <returns>游戏，游戏不存在返回null</returns>
+        /// <exception cref="ArgumentException">修改游戏时，游戏不存在时抛出的异常</exception>
         /// <exception cref="ArgumentNullException">id为null时或value为null时抛出异常</exception>
         public Game this[GameID id]
         {
@@ -50,7 +51,7 @@ namespace GameCenter.Library
                 if (value == null) throw new ArgumentNullException("value");
 
                 if (_dic.ContainsKey(id)) _dic[id] = value;
-                else _dic.Add(id, value);
+                else throw new ArgumentException($"Game not exists:{id}");
             }
         }
 
@@ -181,6 +182,11 @@ namespace GameCenter.Library
         IEnumerator IEnumerable.GetEnumerator()
         {
             return _dic.Values.GetEnumerator();
+        }
+
+        public override string ToString()
+        {
+            return $"Count={_dic.Count}";
         }
     }
 }

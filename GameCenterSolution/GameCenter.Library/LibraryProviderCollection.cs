@@ -26,10 +26,11 @@ namespace GameCenter.Library
 
         /// <summary>
         /// 获取平台，如果不存在则返回null
-        /// 设置平台，如果不存在则添加，存在则覆盖
+        /// 设置平台，如果不存在则抛出异常，存在则覆盖
         /// </summary>
         /// <param name="platformFlag">平台标记</param>
         /// <returns>返回平台，如果不存在则返回null</returns>
+        /// <exception cref="ArgumentException">修改游戏时，游戏不存在时抛出的异常</exception>
         /// <exception cref="ArgumentNullException">如果value=null则抛出异常</exception>
         public ILibraryProvider this[GamePlatformFlags platformFlag]
         {
@@ -45,14 +46,8 @@ namespace GameCenter.Library
                 if (value == null) throw new ArgumentNullException("value");
 
                 int index = IndexOf(platformFlag);
-                if (index == -1)
-                {
-                    _items.Add(value);
-                }
-                else
-                {
-                    _items[index] = value;
-                }
+                if (index != -1) _items[index] = value;
+                else throw new ArgumentException($"Platform not exists:{platformFlag}");
             }
         }
 
@@ -159,6 +154,11 @@ namespace GameCenter.Library
         IEnumerator IEnumerable.GetEnumerator()
         {
             return _items.GetEnumerator();
+        }
+
+        public override string ToString()
+        {
+            return $"Count={_items.Count}";
         }
     }
 }
