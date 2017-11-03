@@ -8,17 +8,17 @@ namespace GameCenter.Library
 {
     internal class SteamCoverDownloadedArgs : EventArgs
     {
-        public SteamCoverDownloadedArgs(Int64 appID, string smallPath, string normalPath, SteamCoverDownloadResultStates state)
+        public SteamCoverDownloadedArgs(Int64 appID, string capsulePath, string headerPath, SteamCoverDownloadResultStates state)
         {
             AppID = appID;
-            SmallPath = smallPath;
-            NormalPath = normalPath;
+            CapsulePath = capsulePath;
+            HeaderPath = headerPath;
             State = state;
         }
 
         public Int64 AppID { get; private set; }
-        public string SmallPath { get; private set; }
-        public string NormalPath { get; private set; }
+        public string CapsulePath { get; private set; }
+        public string HeaderPath { get; private set; }
         public SteamCoverDownloadResultStates State { get; private set; }
     }
 }

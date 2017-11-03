@@ -36,18 +36,18 @@ namespace GameCenter.Library
             return gameCoverFolder;
         }
 
-        public static string GetGameSmallCoverPath(Int64 appID)
+        public static string GetGameCoverCapsule(Int64 appID)
         {
             string coverFolder = GetGameCoverFolder(false);
-            string coverPath = Path.Combine(coverFolder, $"{appID}_small.jpg");
+            string coverPath = Path.Combine(coverFolder, $"{appID}_capsule.jpg");
 
             return coverPath;
         }
 
-        public static string GetGameNormalCoverPath(Int64 appID)
+        public static string GetGameCoverHeader(Int64 appID)
         {
             string coverFolder = GetGameCoverFolder(false);
-            string coverPath = Path.Combine(coverFolder, $"{appID}_normal.jpg");
+            string coverPath = Path.Combine(coverFolder, $"{appID}_header.jpg");
 
             return coverPath;
         }

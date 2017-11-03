@@ -41,13 +41,13 @@ namespace GameCenter.Library
 
         private struct DownloadResult
         {
-            public DownloadResult(string smallPath, string normalPath)
+            public DownloadResult(string capsulePath, string headerPath)
             {
-                SmallPath = smallPath;
-                NormalPath = normalPath;
+                CapsulePath = capsulePath;
+                HeaderPath = headerPath;
             }
-            public string SmallPath { get; private set; }
-            public string NormalPath { get; private set; }
+            public string CapsulePath { get; private set; }
+            public string HeaderPath { get; private set; }
         }
         #endregion
 
@@ -84,9 +84,9 @@ namespace GameCenter.Library
         /// 游戏封面下载完成事件
         /// </summary>
         public event EventHandler<SteamCoverDownloadedArgs> Downloaded;
-        private void OnDownloaded(Int64 appID, string smallPath, string normalPath, SteamCoverDownloadResultStates state)
+        private void OnDownloaded(Int64 appID, string capsulePath, string headerPath, SteamCoverDownloadResultStates state)
         {
-            var args = new SteamCoverDownloadedArgs(appID, smallPath, normalPath, state);
+            var args = new SteamCoverDownloadedArgs(appID, capsulePath, headerPath, state);
             Volatile.Read(ref Downloaded)?.Invoke(this, args);
         }
 
@@ -214,7 +214,7 @@ namespace GameCenter.Library
                 }
 
                 if (item.State == DownloadItemStates.Successed)
-                    OnDownloaded(item.AppID, result.SmallPath, result.NormalPath, SteamCoverDownloadResultStates.Successed);
+                    OnDownloaded(item.AppID, result.CapsulePath, result.HeaderPath, SteamCoverDownloadResultStates.Successed);
                 else if (item.State == DownloadItemStates.Cancelled)
                     OnDownloaded(item.AppID, null, null, SteamCoverDownloadResultStates.Cancelled);
                 else if (item.State == DownloadItemStates.Failed && !item.EnableRetry)
@@ -251,13 +251,13 @@ namespace GameCenter.Library
         {
             HttpClient client = new HttpClient();
             long t = (long)(DateTime.Now - new DateTime(1970, 1, 1)).TotalSeconds;
-            string smallUrl = $"http://cdn.steamstatic.com.8686c.com/steam/apps/{appID}/header_292x136.jpg?t={t}";
-            string normalUrl = $"http://cdn.steamstatic.com.8686c.com/steam/apps/{appID}/header.jpg?t={t}";
-            string smallTmpPath, normalTmpPath;
+            string capsuleUrl = $"http://cdn.steamstatic.com.8686c.com/steam/apps/{appID}/capsule_231x87.jpg?t={t}";
+            string headerUrl = $"http://cdn.steamstatic.com.8686c.com/steam/apps/{appID}/header.jpg?t={t}";
+            string capsuleTmpPath, headerTmpPath;
             // 注册取消操作
             ct.Register(() => client.CancelPendingRequests());
-            // 获取小图
-            using (var stream = await client.GetStreamAsync(smallUrl))
+            // 获取简略图
+            using (var stream = await client.GetStreamAsync(capsuleUrl))
             {
                 string tmpPath = Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
                 using (var fileStream = new FileStream(tmpPath, FileMode.Create, FileAccess.Write, FileShare.Read))
@@ -265,10 +265,10 @@ namespace GameCenter.Library
                     await stream.CopyToAsync(fileStream, 81920, ct);
                 }
 
-                smallTmpPath = tmpPath;
+                capsuleTmpPath = tmpPath;
             }
             // 获取普通大小封面
-            using (var stream = await client.GetStreamAsync(normalUrl))
+            using (var stream = await client.GetStreamAsync(headerUrl))
             {
                 string tmpPath = Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
                 using (var fileStream = new FileStream(tmpPath, FileMode.Create, FileAccess.Write, FileShare.Read))
@@ -276,16 +276,16 @@ namespace GameCenter.Library
                     await stream.CopyToAsync(fileStream, 81920, ct);
                 }
 
-                normalTmpPath = tmpPath;
+                headerTmpPath = tmpPath;
             }
 
             string coverFolder = SteamLibraryEnviroment.GetGameCoverFolder(true);// 确保文件夹存在
-            string smallPath = SteamLibraryEnviroment.GetGameSmallCoverPath(appID);
-            string normalPath = SteamLibraryEnviroment.GetGameNormalCoverPath(appID);
-            File.Copy(smallTmpPath, smallPath, true);
-            File.Copy(normalTmpPath, normalPath, true);
+            string capsulePath = SteamLibraryEnviroment.GetGameCoverCapsule(appID);
+            string headerPath = SteamLibraryEnviroment.GetGameCoverHeader(appID);
+            File.Copy(capsuleTmpPath, capsulePath, true);
+            File.Copy(headerTmpPath, headerPath, true);
 
-            return new DownloadResult(smallPath, normalPath);
+            return new DownloadResult(capsulePath, headerPath);
         }
     }
 }

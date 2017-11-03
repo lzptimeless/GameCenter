@@ -65,6 +65,7 @@
       <DependentUpon>TopBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Common\GameObservableCollection.cs" />
+    <Compile Include="Common\GameViewModel.cs" />
     <Compile Include="Pages\Home.xaml.cs">
       <DependentUpon>Home.xaml</DependentUpon>
     </Compile>

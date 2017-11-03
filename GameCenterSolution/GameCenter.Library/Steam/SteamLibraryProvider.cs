@@ -96,7 +96,7 @@ namespace GameCenter.Library
                         {
                             OnGameAdded(game);
                             // 请求下载游戏封面
-                            if (string.IsNullOrEmpty(game.Cover.Normal))
+                            if (string.IsNullOrEmpty(game.Cover.Header))
                             {
                                 Int64 steamAppID = (game.ID as SteamGameID).AppID;
                                 _coverDownloader.Download(steamAppID, true);
@@ -140,8 +140,9 @@ namespace GameCenter.Library
                     game = _games[gameID];
                     if (game != null)
                     {
-                        game.Cover.Small = e.SmallPath;
-                        game.Cover.Normal = e.NormalPath;
+                        game.Cover.Capsule = e.CapsulePath;
+                        game.Cover.Header = e.HeaderPath;
+                        game.Cover.Full = e.HeaderPath;// Steam游戏的全幅封面用普通封面代替
 
                         game = game.DeepClone();
                     }
@@ -191,11 +192,15 @@ namespace GameCenter.Library
             }
 
             // 获取游戏封面
-            string smallCoverPath = SteamLibraryEnviroment.GetGameSmallCoverPath(appID);
-            if (File.Exists(smallCoverPath)) game.Cover.Small = smallCoverPath;
+            string coverCapsulePath = SteamLibraryEnviroment.GetGameCoverCapsule(appID);
+            if (File.Exists(coverCapsulePath)) game.Cover.Capsule = coverCapsulePath;
 
-            string normalCoverPath = SteamLibraryEnviroment.GetGameNormalCoverPath(appID);
-            if (File.Exists(normalCoverPath)) game.Cover.Normal = normalCoverPath;
+            string coverHeaderPath = SteamLibraryEnviroment.GetGameCoverHeader(appID);
+            if (File.Exists(coverHeaderPath))
+            {
+                game.Cover.Header = coverHeaderPath;
+                game.Cover.Full = coverHeaderPath;// Steam游戏的full cover用header cover代替
+            }
 
             return game;
         }
