@@ -15,7 +15,7 @@ namespace GameCenter.Library
 
         public string Name { get; set; }
 
-        public override PlatformGameInfo DeepClone()
+        public override PlatformGameInfo Clone()
         {
             BattleNetGameInfo clone = MemberwiseClone() as BattleNetGameInfo;
 

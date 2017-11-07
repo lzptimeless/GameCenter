@@ -17,7 +17,7 @@ namespace GameCenter.UI
     /// <summary>
     /// 可视游戏集合辅助类，不支持线程安全
     /// </summary>
-    internal class GameObservableCollection : ICollection<Game>, INotifyCollectionChanged, INotifyPropertyChanged
+    internal class GameObservableCollection : ICollection<GameViewModel>, INotifyCollectionChanged, INotifyPropertyChanged
     {
         #region classes
         private enum GameEventDataFlags
@@ -35,16 +35,16 @@ namespace GameCenter.UI
                 Game = game;
             }
 
-            public MixGameEventData(GameEventDataFlags flag, Game game, GameUpdatedFields fields)
+            public MixGameEventData(GameEventDataFlags flag, Game game, IReadOnlyList<PropertyPath> properties)
             {
                 Flag = flag;
                 Game = game;
-                UpdatedFields = fields;
+                UpdatedProperties = properties;
             }
 
             public GameEventDataFlags Flag { get; private set; }
             public Game Game { get; private set; }
-            public GameUpdatedFields UpdatedFields { get; private set; }
+            public IReadOnlyList<PropertyPath> UpdatedProperties { get; private set; }
 
             public override string ToString()
             {
@@ -57,19 +57,19 @@ namespace GameCenter.UI
         {
             _syncEventObj = new object();
             _uiDispatcher = Dispatcher.CurrentDispatcher;
-            _games = new ObservableCollection<Game>();
-            _dic = new Dictionary<GameID, Game>();
+            _games = new ObservableCollection<GameViewModel>();
+            _dic = new Dictionary<GameID, GameViewModel>();
             _eventDatas = new List<EventData>();
         }
 
         /// <summary>
         /// 用于UI显示的游戏集合，提供UI所需的通知功能
         /// </summary>
-        private ObservableCollection<Game> _games;
+        private ObservableCollection<GameViewModel> _games;
         /// <summary>
         /// 辅助进行查询操作，在游戏数量很大时有优势
         /// </summary>
-        private Dictionary<GameID, Game> _dic;
+        private Dictionary<GameID, GameViewModel> _dic;
         /// <summary>
         /// 用以暂时存储UI线程来不及处理的事件数据
         /// </summary>
@@ -105,7 +105,7 @@ namespace GameCenter.UI
         /// <returns>id代表的游戏，游戏不存在时返回null</returns>
         /// <exception cref="ArgumentException">设置游戏时，游戏不存在时抛出的异常</exception>
         /// <exception cref="ArgumentNullException">参数id，value为null时抛出的异常</exception>
-        public Game this[GameID id]
+        public GameViewModel this[GameID id]
         {
             get
             {
@@ -166,7 +166,7 @@ namespace GameCenter.UI
         /// <param name="game">游戏</param>
         /// <exception cref="ArgumentException">game.ID为null，游戏已经存在时抛出异常</exception>
         /// <exception cref="ArgumentNullException">game为null时抛出异常</exception>
-        public void Add(Game game)
+        public void Add(GameViewModel game)
         {
             Add(game, false);
         }
@@ -180,6 +180,19 @@ namespace GameCenter.UI
         /// <exception cref="ArgumentException">game.ID为null，ignoreIfExists为false游戏已经存在时抛出异常</exception>
         /// <exception cref="ArgumentNullException">game为null时抛出异常</exception>
         public bool Add(Game game, bool ignoreIfExists)
+        {
+            return Add(new GameViewModel(game), ignoreIfExists);
+        }
+
+        /// <summary>
+        /// 添加游戏
+        /// </summary>
+        /// <param name="game">游戏</param>
+        /// <param name="ignoreIfExists">如果游戏已经存在，true:忽略这次操作，false:抛出异常</param>
+        /// <returns>true:添加成功，false:游戏已经存在</returns>
+        /// <exception cref="ArgumentException">game.ID为null，ignoreIfExists为false游戏已经存在时抛出异常</exception>
+        /// <exception cref="ArgumentNullException">game为null时抛出异常</exception>
+        public bool Add(GameViewModel game, bool ignoreIfExists)
         {
             if (game == null) throw new ArgumentNullException("game");
             if (game.ID == null) throw new ArgumentException("ID is null");
@@ -208,6 +221,21 @@ namespace GameCenter.UI
             {
                 Add(g, false);
             }
+        }
+
+        /// <summary>
+        /// 移除游戏，移除成功返回true，游戏不存在返回false
+        /// </summary>
+        /// <param name="game">游戏</param>
+        /// <returns>移除成功返回true，游戏不存在返回false</returns>
+        /// <exception cref="ArgumentNullException">game为null时抛出的异常</exception>
+        /// <exception cref="ArgumentException">game.ID为null时抛出的异常</exception>
+        public bool Remove(GameViewModel game)
+        {
+            if (game == null) throw new ArgumentNullException("game");
+            if (game.ID == null) throw new ArgumentException("ID is null");
+
+            return Remove(game.ID);
         }
 
         /// <summary>
@@ -260,6 +288,21 @@ namespace GameCenter.UI
         /// <returns>true:游戏存在，false:游戏不存在</returns>
         /// <exception cref="ArgumentException">game.ID为null时抛出的异常</exception>
         /// <exception cref="ArgumentNullException">game为null时抛出的异常</exception>
+        public bool Contains(GameViewModel game)
+        {
+            if (game == null) throw new ArgumentNullException("game");
+            if (game.ID == null) throw new ArgumentException("ID is null");
+
+            return _dic.ContainsKey(game.ID);
+        }
+
+        /// <summary>
+        /// 游戏是否存在
+        /// </summary>
+        /// <param name="game">游戏</param>
+        /// <returns>true:游戏存在，false:游戏不存在</returns>
+        /// <exception cref="ArgumentException">game.ID为null时抛出的异常</exception>
+        /// <exception cref="ArgumentNullException">game为null时抛出的异常</exception>
         public bool Contains(Game game)
         {
             if (game == null) throw new ArgumentNullException("game");
@@ -281,12 +324,12 @@ namespace GameCenter.UI
             return _dic.ContainsKey(id);
         }
 
-        public void CopyTo(Game[] array, int arrayIndex)
+        public void CopyTo(GameViewModel[] array, int arrayIndex)
         {
-            ((ICollection<Game>)_games).CopyTo(array, arrayIndex);
+            ((ICollection<GameViewModel>)_games).CopyTo(array, arrayIndex);
         }
 
-        public IEnumerator<Game> GetEnumerator()
+        public IEnumerator<GameViewModel> GetEnumerator()
         {
             return _games.GetEnumerator();
         }
@@ -370,18 +413,18 @@ namespace GameCenter.UI
 
         private void OnUIGameAdded(GameAddedEventData obj)
         {
-            Add(obj.Game, true);
+            Add(obj.Model, true);
         }
 
         private void OnUIGameRemoved(GameRemovedEventData obj)
         {
-            Remove(obj.Game);
+            Remove(obj.Model);
         }
 
         private void OnUIGameUpdated(GameUpdatedEventData obj)
         {
-            if (Contains(obj.Game))
-                this[obj.Game.ID] = obj.Game;
+            if (Contains(obj.Model))
+                this[obj.Model.ID].Update(obj.Model, obj.UpdatedPropertyPaths?.ToArray());
         }
 
         private List<EventData> PretreatEventDatas(List<EventData> eventDatas)
@@ -422,7 +465,7 @@ namespace GameCenter.UI
                     else if (mixBefore.Flag == GameEventDataFlags.Removed)
                     {
                         if (Contains(mixBefore.Game))
-                            merged = new GameUpdatedEventData(mixAfter.Game, GameUpdatedFields.All);
+                            merged = new GameUpdatedEventData(mixAfter.Game, null);
                         else
                             merged = after;
                     }
@@ -464,16 +507,16 @@ namespace GameCenter.UI
 
             if (ed is GameAddedEventData)
             {
-                return new MixGameEventData(GameEventDataFlags.Added, (ed as GameAddedEventData).Game);
+                return new MixGameEventData(GameEventDataFlags.Added, (ed as GameAddedEventData).Model);
             }
             else if (ed is GameRemovedEventData)
             {
-                return new MixGameEventData(GameEventDataFlags.Removed, (ed as GameRemovedEventData).Game);
+                return new MixGameEventData(GameEventDataFlags.Removed, (ed as GameRemovedEventData).Model);
             }
             else if (ed is GameUpdatedEventData)
             {
                 var updatedEd = ed as GameUpdatedEventData;
-                return new MixGameEventData(GameEventDataFlags.Updated, updatedEd.Game, updatedEd.Fields);
+                return new MixGameEventData(GameEventDataFlags.Updated, updatedEd.Model, updatedEd.UpdatedPropertyPaths);
             }
             else throw new ArgumentException($"Not support game event data type:{ed.GetType().FullName}");
         }

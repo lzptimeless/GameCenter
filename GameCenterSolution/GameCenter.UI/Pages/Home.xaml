@@ -16,7 +16,7 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <Rectangle Fill="Gray"/>
-                        <Image Source="{Binding Cover.Capsule}" Width="184" Height="69" Stretch="Uniform"/>
+                        <Image Source="{Binding CoverCapsule}" Width="184" Height="69" Stretch="Uniform"/>
                         <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="10,0,0,0" VerticalAlignment="Center"
                                    TextTrimming="CharacterEllipsis"/>
                     </Grid>

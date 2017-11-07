@@ -178,7 +178,7 @@ namespace GameCenter.Library
             bool isAdded = false;
             lock (_syncObj)
             {
-                isAdded = _games.Add(e.Game.DeepClone(), true);
+                isAdded = _games.Add(e.Model.Clone() as Game, true);
             }
 
             if (isAdded) GameAddedEvent.Publish(e);
@@ -189,7 +189,7 @@ namespace GameCenter.Library
             bool isRemoved = false;
             lock (_syncObj)
             {
-                isRemoved = _games.Remove(e.Game);
+                isRemoved = _games.Remove(e.Model);
             }
 
             if (isRemoved) GameRemovedEvent.Publish(e);
@@ -200,10 +200,10 @@ namespace GameCenter.Library
             bool isUpdate = false;
             lock (_syncObj)
             {
-                if (_games.Contains(e.Game.ID))
+                if (_games.Contains(e.Model.ID))
                 {
                     isUpdate = true;
-                    _games[e.Game.ID] = e.Game.DeepClone();
+                    _games[e.Model.ID] = e.Model.Clone() as Game;
                 }
             }
 

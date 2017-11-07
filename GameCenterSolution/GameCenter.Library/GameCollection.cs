@@ -168,7 +168,7 @@ namespace GameCenter.Library
             List<Game> list = new List<Game>(_dic.Count);
             foreach (var game in _dic.Values)
             {
-                list.Add(game.DeepClone());
+                list.Add(game.Clone() as Game);
             }
 
             return list;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AppCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,10 +39,9 @@ namespace GameCenter.Library
         }
 
         public event EventHandler<GameUpdatedEventData> GameUpdated;
-        private void OnGameUpdated(Game game, GameUpdatedFields fields)
+        private void OnGameUpdated(GameUpdatedEventData args)
         {
-            GameUpdatedEventData data = new GameUpdatedEventData(game, fields);
-            Volatile.Read(ref GameUpdated)?.Invoke(this, data);
+            Volatile.Read(ref GameUpdated)?.Invoke(this, args);
         }
 
         public Task ScanAsync(CancellationToken ct)
@@ -58,7 +58,7 @@ namespace GameCenter.Library
                 Game game;
                 lock (_syncObj)
                 {
-                    game = _games[id]?.DeepClone();
+                    game = _games[id]?.Clone() as Game;
                 }
 
                 if (game == null) throw new InvalidOperationException($"Can not found game:{id}");

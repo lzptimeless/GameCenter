@@ -11,13 +11,10 @@ namespace GameCenter.Library
     {
     }
 
-    public class GameAddedEventData : EventData
+    public class GameAddedEventData : ModelEventData<Game>
     {
-        public GameAddedEventData(Game game)
+        public GameAddedEventData(Game model) : base(model)
         {
-            Game = game;
         }
-
-        public Game Game { get; private set; }
     }
 }

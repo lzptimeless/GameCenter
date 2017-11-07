@@ -28,7 +28,7 @@ namespace GameCenter.Library
         /// </summary>
         public string Full { get; set; }
 
-        public GameCover DeepClone()
+        public GameCover Clone()
         {
             return (GameCover)MemberwiseClone();
         }

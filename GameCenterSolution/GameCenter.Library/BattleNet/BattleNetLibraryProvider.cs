@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using AppCore;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,10 +40,9 @@ namespace GameCenter.Library
         }
 
         public event EventHandler<GameUpdatedEventData> GameUpdated;
-        private void OnGameUpdated(Game game, GameUpdatedFields fields)
+        private void OnGameUpdated(GameUpdatedEventData args)
         {
-            GameUpdatedEventData data = new GameUpdatedEventData(game, fields);
-            Volatile.Read(ref GameUpdated)?.Invoke(this, data);
+            Volatile.Read(ref GameUpdated)?.Invoke(this, args);
         }
 
         public Task ScanAsync(CancellationToken cancelToken)
@@ -67,11 +67,12 @@ namespace GameCenter.Library
                         lock (_syncObj)
                         {
                             isAdded = _games.Add(game, true);
-                            game = game.DeepClone();
+                            game = game.Clone() as Game;
                         }
 
                         if (isAdded)
                         {
+                            game.SetReadOnly();
                             OnGameAdded(game);
                         }
                     }
@@ -88,7 +89,7 @@ namespace GameCenter.Library
                 Game game;
                 lock (_syncObj)
                 {
-                    game = _games[id]?.DeepClone();
+                    game = _games[id]?.Clone() as Game;
                 }
 
                 if (game == null) throw new InvalidOperationException($"Can not found game:{id}");

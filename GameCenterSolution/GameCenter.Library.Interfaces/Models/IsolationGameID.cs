@@ -25,7 +25,7 @@ namespace GameCenter.Library
             return $"{PlatformFlag}, {Launcher}";
         }
 
-        public override GameID DeepClone()
+        public override GameID Clone()
         {
             IsolationGameID clone = MemberwiseClone() as IsolationGameID;
 

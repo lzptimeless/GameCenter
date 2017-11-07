@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using AppCore;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -44,12 +45,10 @@ namespace GameCenter.Library
         }
 
         public event EventHandler<GameUpdatedEventData> GameUpdated;
-        private void OnGameUpdated(Game game, GameUpdatedFields fields)
+        private void OnGameUpdated(GameUpdatedEventData args)
         {
-            GameUpdatedEventData data = new GameUpdatedEventData(game, fields);
-            Volatile.Read(ref GameUpdated)?.Invoke(this, data);
+            Volatile.Read(ref GameUpdated)?.Invoke(this, args);
         }
-
 
         public Task ScanAsync(CancellationToken cancelToken)
         {
@@ -89,11 +88,12 @@ namespace GameCenter.Library
                         lock (_syncObj)
                         {
                             isAdded = _games.Add(game, true);
-                            game = game.DeepClone();
+                            game = game.Clone() as Game;
                         }
 
                         if (isAdded)
                         {
+                            game.SetReadOnly();
                             OnGameAdded(game);
                             // 请求下载游戏封面
                             if (string.IsNullOrEmpty(game.Cover.Header))
@@ -116,7 +116,7 @@ namespace GameCenter.Library
                 Game game;
                 lock (_syncObj)
                 {
-                    game = _games[id]?.DeepClone();
+                    game = _games[id]?.Clone() as Game;
                 }
 
                 if (game == null) throw new InvalidOperationException($"Can not found game:{id}");
@@ -144,11 +144,15 @@ namespace GameCenter.Library
                         game.Cover.Header = e.HeaderPath;
                         game.Cover.Full = e.HeaderPath;// Steam游戏的全幅封面用普通封面代替
 
-                        game = game.DeepClone();
+                        game = game.Clone() as Game;
                     }
                 }
 
-                if (game != null) OnGameUpdated(game, GameUpdatedFields.Cover);
+                if (game != null)
+                {
+                    game.SetReadOnly();
+                    OnGameUpdated(GameUpdatedEventData.Create(game, () => game.Cover));
+                }
             }
         }
 

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,24 +12,31 @@ namespace GameCenter.Library
     {
     }
 
-    public class GameUpdatedEventData : EventData
+    public class GameUpdatedEventData : ModelUpdatedEventData<Game>
     {
-        public GameUpdatedEventData(Game game, GameUpdatedFields fields)
+        public GameUpdatedEventData(Game model, IEnumerable<PropertyPath> updatedPaths)
+            : base(model, updatedPaths)
         {
-            Game = game;
-            Fields = fields;
         }
 
-        public Game Game { get; private set; }
-        public GameUpdatedFields Fields { get; private set; }
-    }
+        public new static GameUpdatedEventData Create<TProperty>(Game model,
+            params Expression<Func<TProperty>>[] propertyExpressions)
+        {
+            if (model == null) throw new ArgumentNullException("model");
 
-    [Flags]
-    public enum GameUpdatedFields
-    {
-        Name = 0x1,
-        Cover = 0x2,
-        PlatformGameInfo = 0x4,
-        All = Name | Cover | PlatformGameInfo
+            List<PropertyPath> propertyPaths = null;
+            if (propertyExpressions != null)
+            {
+                propertyPaths = new List<PropertyPath>();
+                foreach (var propertyExpression in propertyExpressions)
+                {
+                    PropertyPath propPath = PropertySupport.ExtractPropertyPath(propertyExpression);
+                    propertyPaths.Add(propPath);
+                }
+            }
+
+            GameUpdatedEventData data = new GameUpdatedEventData(model, propertyPaths);
+            return data;
+        }
     }
 }

@@ -25,7 +25,7 @@ namespace GameCenter.Library
             return $"{PlatformFlag}, {Name}";
         }
 
-        public override GameID DeepClone()
+        public override GameID Clone()
         {
             BattleNetGameID clone = MemberwiseClone() as BattleNetGameID;
 

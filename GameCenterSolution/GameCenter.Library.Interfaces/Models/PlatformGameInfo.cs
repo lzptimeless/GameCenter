@@ -10,6 +10,6 @@ namespace GameCenter.Library
     {
         public abstract GamePlatformFlags PlatformFlag { get; }
 
-        public abstract PlatformGameInfo DeepClone();
+        public abstract PlatformGameInfo Clone();
     }
 }

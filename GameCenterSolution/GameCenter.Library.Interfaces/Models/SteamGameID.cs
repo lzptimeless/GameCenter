@@ -25,7 +25,7 @@ namespace GameCenter.Library
             return $"{PlatformFlag}, {AppID}";
         }
 
-        public override GameID DeepClone()
+        public override GameID Clone()
         {
             SteamGameID clone = MemberwiseClone() as SteamGameID;
 

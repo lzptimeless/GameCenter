@@ -10,7 +10,7 @@ namespace GameCenter.Library
     {
         public abstract GamePlatformFlags PlatformFlag { get; }
 
-        public abstract GameID DeepClone();
+        public abstract GameID Clone();
 
         protected abstract int InnerGetHashCode();
 
