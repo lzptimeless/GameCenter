@@ -25,11 +25,9 @@ namespace GameCenter.Library
             return $"{PlatformFlag}, {Name}";
         }
 
-        public override GameID Clone()
+        protected override object CloneInner()
         {
-            BattleNetGameID clone = MemberwiseClone() as BattleNetGameID;
-
-            return clone;
+            return MemberwiseClone();
         }
 
         protected override bool InnerEquals(GameID other)

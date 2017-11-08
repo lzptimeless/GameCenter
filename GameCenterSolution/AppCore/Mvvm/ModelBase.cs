@@ -12,29 +12,45 @@ namespace AppCore
     public abstract class ModelBase : ICloneable
     {
         /// <summary>
-        /// true: Can only read property, can not set property
-        /// false: Can read and set property
+        /// true: 这个实例的属性只读，任何修改操作都会抛出异常
+        /// false: 这个实例的属性可以修改
         /// </summary>
         public bool IsReadOnly { get; private set; }
 
         /// <summary>
-        /// Set <see cref="IsReadOnly"/> to true
+        /// 设置对象为只读，之后任何修改对象属性的行为都会抛出异常，并且不能解除这个
+        /// 设置，只有通过<see cref="Clone"/>函数获得一份全新的实例，这个新的实例
+        /// 的属性可以修改
         /// </summary>
-        public void SetReadOnly()
+        public virtual void SetReadOnly()
         {
             IsReadOnly = true;
         }
 
         /// <summary>
-        /// 复制实例，注意需要重置<see cref="IsReadOnly"/>属性
+        /// 复制实例，复制实例的<see cref="IsReadOnly"/>将被重置为false
         /// </summary>
-        /// <returns>复制的数据模型，<see cref="IsReadOnly"/>为false</returns>
-        public abstract object Clone();
+        /// <returns>复制的数据模型</returns>
+        public object Clone()
+        {
+            ModelBase mb = CloneInner() as ModelBase;
+            if (mb == null)
+                throw new InvalidCastException("Clone result should not be null and be ModelBase.");
+
+            mb.ResetReadOnly();
+            return mb;
+        }
 
         /// <summary>
-        /// Set <see cref="IsReadOnly"/> to false
+        /// 复制实例
         /// </summary>
-        protected void ResetReadOnly()
+        /// <returns>复制的数据模型</returns>
+        protected abstract object CloneInner();
+
+        /// <summary>
+        /// 重置<see cref="IsReadOnly"/>属性
+        /// </summary>
+        private void ResetReadOnly()
         {
             IsReadOnly = false;
         }

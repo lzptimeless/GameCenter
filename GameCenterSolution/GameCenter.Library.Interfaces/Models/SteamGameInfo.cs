@@ -15,11 +15,9 @@ namespace GameCenter.Library
 
         public Int64 AppID { get; set; }
 
-        public override PlatformGameInfo Clone()
+        protected override object CloneInner()
         {
-            SteamGameInfo clone = MemberwiseClone() as SteamGameInfo;
-
-            return clone;
+            return MemberwiseClone();
         }
     }
 }

@@ -16,7 +16,7 @@ namespace AppCore
         /// <summary>
         /// 属性绑定缓存，加快获取属性绑定的速度
         /// </summary>
-        private static PropertyBindingCollection<TModel> _propertyBindings = null;
+        private static IReadOnlyList<PropertyBindingBase<TModel>> _propertyBindings = null;
 
         /// <summary>
         /// 获取属性绑定集合，如果还没有创建会自动调用<see cref="CreatePropertyBindings"/>
@@ -57,9 +57,10 @@ namespace AppCore
         }
 
         /// <summary>
-        /// 创建属性绑定，一个类型可能只会调用一次
+        /// 创建所有属性绑定，一个类型可能只会调用一次，可以用<see cref="PropertyBindingCollection{TModel, TUpdateTarget}"/>
+        /// 来辅助创建集合
         /// </summary>
         /// <returns>属性绑定集合</returns>
-        protected abstract PropertyBindingCollection<TModel> CreatePropertyBindings();
+        protected abstract IReadOnlyList<PropertyBindingBase<TModel>> CreatePropertyBindings();
     }
 }

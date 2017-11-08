@@ -15,11 +15,9 @@ namespace GameCenter.Library
 
         public string Launcher { get; set; }
 
-        public override PlatformGameInfo Clone()
+        protected override object CloneInner()
         {
-            IsolationGameInfo clone = MemberwiseClone() as IsolationGameInfo;
-
-            return clone;
+            return MemberwiseClone();
         }
     }
 }

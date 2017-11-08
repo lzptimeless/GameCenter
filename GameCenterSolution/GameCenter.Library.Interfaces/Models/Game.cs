@@ -78,20 +78,12 @@ namespace GameCenter.Library
         }
         #endregion
 
-        /// <summary>
-        /// 复制游戏，复制的游戏的<see cref="ModelBase.IsReadOnly"/>属性将被重置
-        /// </summary>
-        /// <returns></returns>
-        public override object Clone()
+        public override void SetReadOnly()
         {
-            Game clone = (Game)MemberwiseClone();
-            clone.ResetReadOnly();
-
-            if (ID != null) clone.ID = ID.Clone();
-            if (Cover != null) clone.Cover = Cover.Clone();
-            if (PlatformGameInfo != null) clone.PlatformGameInfo = PlatformGameInfo.Clone();
-
-            return clone;
+            base.SetReadOnly();
+            ID?.SetReadOnly();
+            Cover?.SetReadOnly();
+            PlatformGameInfo?.SetReadOnly();
         }
 
         public override string ToString()
@@ -105,6 +97,17 @@ namespace GameCenter.Library
             }
 
             return sb.ToString();
+        }
+
+        protected override object CloneInner()
+        {
+            Game clone = (Game)MemberwiseClone();
+
+            if (_id != null) clone._id = _id.CloneEx();
+            if (_cover != null) clone._cover = _cover.CloneEx();
+            if (_platformGameInfo != null) clone._platformGameInfo = _platformGameInfo.CloneEx();
+
+            return clone;
         }
     }
 }

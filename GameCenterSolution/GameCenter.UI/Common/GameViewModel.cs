@@ -63,14 +63,14 @@ namespace GameCenter.UI
         }
         #endregion
 
-        protected override PropertyBindingCollection<Game> CreatePropertyBindings()
+        protected override IReadOnlyList<PropertyBindingBase<Game>> CreatePropertyBindings()
         {
-            PropertyBindingCollection<Game> bindings = new PropertyBindingCollection<Game>();
+            PropertyBindingCollection<Game, GameViewModel> bindings = new PropertyBindingCollection<Game, GameViewModel>();
 
-            bindings.Add<GameID, GameViewModel>(g => g.ID, (vm, id) => vm.ID = id);
-            bindings.Add<string, GameViewModel>(g => g.Name, (vm, name) => vm.Name = name);
-            bindings.Add<string, GameViewModel>(g => g.Cover.Capsule, (vm, capsule) => vm.CoverCapsule = capsule);
-            bindings.Add<string, GameViewModel>(g => g.Cover.Header, (vm, header) => vm.CoverHeader = header);
+            bindings.Add(g => g.ID, (vm, id) => vm.ID = id);
+            bindings.Add(g => g.Name, (vm, name) => vm.Name = name);
+            bindings.Add(g => g.Cover.Capsule, (vm, capsule) => vm.CoverCapsule = capsule);
+            bindings.Add(g => g.Cover.Header, (vm, header) => vm.CoverHeader = header);
 
             return bindings;
         }

@@ -65,6 +65,9 @@
       <Name>AppCore</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Ideals.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if not exist "$(SolutionDir)TestConsole\$(OutDir)Interfaces" md "$(SolutionDir)TestConsole\$(OutDir)Interfaces"

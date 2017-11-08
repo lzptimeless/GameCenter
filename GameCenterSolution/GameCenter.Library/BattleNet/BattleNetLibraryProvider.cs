@@ -55,6 +55,33 @@ namespace GameCenter.Library
                     if (hearthstoneKey != null)
                     {
                         string name = hearthstoneKey.GetValue("DisplayName") as string;
+                        string displayIcon = hearthstoneKey.GetValue("DisplayIcon") as string;
+
+                        IconTools.IconExtractor iconExtractor = new IconTools.IconExtractor(displayIcon, 1);
+                        var icon = iconExtractor.GetIcon(0);
+                        var iconItems = IconTools.IconUtil.Split(icon);
+                        System.Drawing.Icon maxIcon = iconItems[0];
+                        int maxIconBit = IconTools.IconUtil.GetBitCount(maxIcon);
+                        foreach (var iconItem in iconItems)
+                        {
+                            int iconItemBit = IconTools.IconUtil.GetBitCount(iconItem);
+                            if (iconItemBit < maxIconBit) continue;
+                            if (iconItem.Width < maxIcon.Width) continue;
+
+                            maxIcon = iconItem;
+                            maxIconBit = iconItemBit;
+                        }
+
+                        // 保存最清晰的图标到本地
+
+
+                        // 释放所有临时资源
+                        foreach (var iconItem in iconItems)
+                        {
+                            iconItem.Dispose();
+                        }
+                        icon.Dispose();
+
                         Game game = new Game();
                         game.Name = name;
                         game.ID = new BattleNetGameID(name);

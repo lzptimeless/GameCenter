@@ -88,6 +88,7 @@
     <Compile Include="Mvvm\Commands\WeakEventHandlerManager.cs" />
     <Compile Include="Mvvm\ModelBase.cs" />
     <Compile Include="Mvvm\ModelEventData.cs" />
+    <Compile Include="Mvvm\ModelExtensions.cs" />
     <Compile Include="Mvvm\PropertyBinding.cs" />
     <Compile Include="Mvvm\PropertyPath.cs" />
     <Compile Include="Mvvm\PropertySupport.cs" />

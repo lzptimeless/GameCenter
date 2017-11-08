@@ -166,7 +166,9 @@ namespace AppCore
     /// 数据绑定集合，不支持线程安全
     /// </summary>
     /// <typeparam name="TModel">数据模型类型</typeparam>
-    public class PropertyBindingCollection<TModel> : ICollection<PropertyBindingBase<TModel>>, IReadOnlyList<PropertyBindingBase<TModel>>
+    /// <typeparam name="TUpdateTarget">需要更新的对象类型，这个类型就是继承了<see cref="BindableModel{TModel}"/>
+    /// 的类型</typeparam>
+    public class PropertyBindingCollection<TModel, TUpdateTarget> : ICollection<PropertyBindingBase<TModel>>, IReadOnlyList<PropertyBindingBase<TModel>>
     {
         private List<PropertyBindingBase<TModel>> _bindings = new List<PropertyBindingBase<TModel>>();
 
@@ -185,7 +187,7 @@ namespace AppCore
             get { return _bindings[index]; }
         }
 
-        public void Add<TProperty, TUpdateTarget>(Expression<Func<TModel, TProperty>> propertyExpression,
+        public void Add<TProperty>(Expression<Func<TModel, TProperty>> propertyExpression,
             Action<TUpdateTarget, TProperty> update)
         {
             PropertyBinding<TModel, TProperty, TUpdateTarget> binding = new PropertyBinding<TModel, TProperty, TUpdateTarget>(
@@ -194,7 +196,7 @@ namespace AppCore
             _bindings.Add(binding);
         }
 
-        public void Add<TProperty1, TProperty2, TUpdateTarget>(Expression<Func<TModel, TProperty1>> propertyExpression1,
+        public void Add<TProperty1, TProperty2>(Expression<Func<TModel, TProperty1>> propertyExpression1,
             Expression<Func<TModel, TProperty2>> propertyExpression2,
             Action<TUpdateTarget, TProperty1, TProperty2> update)
         {
@@ -205,7 +207,7 @@ namespace AppCore
             _bindings.Add(binding);
         }
 
-        public void Add<TProperty1, TProperty2, TProperty3, TUpdateTarget>(Expression<Func<TModel, TProperty1>> propertyExpression1,
+        public void Add<TProperty1, TProperty2, TProperty3>(Expression<Func<TModel, TProperty1>> propertyExpression1,
             Expression<Func<TModel, TProperty2>> propertyExpression2,
             Expression<Func<TModel, TProperty3>> propertyExpression3,
             Action<TUpdateTarget, TProperty1, TProperty2, TProperty3> update)

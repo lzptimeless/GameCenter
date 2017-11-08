@@ -195,6 +195,9 @@ namespace GameCenter.Library
                 }
             }
 
+            // 获取游戏图标
+            //string iconPath = 
+
             // 获取游戏封面
             string coverCapsulePath = SteamLibraryEnviroment.GetGameCoverCapsule(appID);
             if (File.Exists(coverCapsulePath)) game.Cover.Capsule = coverCapsulePath;

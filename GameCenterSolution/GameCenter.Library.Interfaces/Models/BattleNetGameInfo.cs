@@ -15,11 +15,9 @@ namespace GameCenter.Library
 
         public string Name { get; set; }
 
-        public override PlatformGameInfo Clone()
+        protected override object CloneInner()
         {
-            BattleNetGameInfo clone = MemberwiseClone() as BattleNetGameInfo;
-
-            return clone;
+            return MemberwiseClone();
         }
     }
 }

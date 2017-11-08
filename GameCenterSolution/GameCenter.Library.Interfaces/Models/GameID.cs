@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AppCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,11 +7,9 @@ using System.Threading.Tasks;
 
 namespace GameCenter.Library
 {
-    public abstract class GameID : IEquatable<GameID>
+    public abstract class GameID : ModelBase, IEquatable<GameID>
     {
         public abstract GamePlatformFlags PlatformFlag { get; }
-
-        public abstract GameID Clone();
 
         protected abstract int InnerGetHashCode();
 

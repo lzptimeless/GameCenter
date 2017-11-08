@@ -25,11 +25,9 @@ namespace GameCenter.Library
             return $"{PlatformFlag}, {AppID}";
         }
 
-        public override GameID Clone()
+        protected override object CloneInner()
         {
-            SteamGameID clone = MemberwiseClone() as SteamGameID;
-
-            return clone;
+            return MemberwiseClone();
         }
 
         protected override int InnerGetHashCode()
