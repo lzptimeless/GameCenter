@@ -8,39 +8,34 @@ namespace GameCenter.Library
 {
     public class SteamGameID : GameID
     {
+        /// <summary>
+        /// 通过元数据创建游戏ID
+        /// </summary>
+        /// <param name="metadata">元数据</param>
+        public SteamGameID(UInt64 metadata)
+        {
+            Metadata = metadata;
+            if (PlatformFlag != GamePlatformFlags.Steam)
+                throw new ArgumentException($"Platform should be {GamePlatformFlags.Steam}:{metadata:X}");
+        }
+
+        /// <summary>
+        /// 通过Steam AppID创建游戏ID
+        /// </summary>
+        /// <param name="appID">Steam AppID</param>
         public SteamGameID(Int64 appID)
         {
-            AppID = appID;
+            Version = DefaultVersion;
+            PlatformFlag = GamePlatformFlags.Steam;
+            Number = appID;
         }
 
-        public override GamePlatformFlags PlatformFlag
+        /// <summary>
+        /// Steam AppID，等于<see cref="GameID.Number"/>
+        /// </summary>
+        public Int64 AppID
         {
-            get { return GamePlatformFlags.Steam; }
-        }
-
-        public Int64 AppID { get; private set; }
-
-        public override string ToString()
-        {
-            return $"{PlatformFlag}, {AppID}";
-        }
-
-        protected override object CloneInner()
-        {
-            return MemberwiseClone();
-        }
-
-        protected override int InnerGetHashCode()
-        {
-            return AppID.GetHashCode();
-        }
-
-        protected override bool InnerEquals(GameID other)
-        {
-            SteamGameID other1 = other as SteamGameID;
-            if (object.ReferenceEquals(other1, null)) return false;
-
-            return other1.AppID == AppID;
+            get { return Number; }
         }
     }
 }

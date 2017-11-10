@@ -81,7 +81,6 @@ namespace GameCenter.Library
         public override void SetReadOnly()
         {
             base.SetReadOnly();
-            ID?.SetReadOnly();
             Cover?.SetReadOnly();
             PlatformGameInfo?.SetReadOnly();
         }
@@ -102,8 +101,8 @@ namespace GameCenter.Library
         protected override object CloneInner()
         {
             Game clone = (Game)MemberwiseClone();
-
-            if (_id != null) clone._id = _id.CloneEx();
+            
+            if (_id != null) clone._id = _id;
             if (_cover != null) clone._cover = _cover.CloneEx();
             if (_platformGameInfo != null) clone._platformGameInfo = _platformGameInfo.CloneEx();
 

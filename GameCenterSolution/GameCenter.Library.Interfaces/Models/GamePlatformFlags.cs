@@ -8,8 +8,12 @@ namespace GameCenter.Library
 {
     public enum GamePlatformFlags
     {
+        Unkown,
         Isolation,
+        Steam,
         BattleNet,
-        Steam
+        TGA,
+        Origin,
+        Uplay
     }
 }

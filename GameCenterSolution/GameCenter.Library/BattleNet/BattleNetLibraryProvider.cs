@@ -84,7 +84,7 @@ namespace GameCenter.Library
 
                         Game game = new Game();
                         game.Name = name;
-                        game.ID = new BattleNetGameID(name);
+                        game.ID = new BattleNetGameID(ulong.MaxValue);
 
                         var gameInfo = new BattleNetGameInfo();
                         gameInfo.Name = name;

@@ -8,39 +8,15 @@ namespace GameCenter.Library
 {
     public class BattleNetGameID : GameID
     {
-        public BattleNetGameID(string name)
+        /// <summary>
+        /// 通过元数据创建游戏ID
+        /// </summary>
+        /// <param name="metadata">元数据</param>
+        public BattleNetGameID(UInt64 metadata)
         {
-            Name = name;
-        }
-
-        public override GamePlatformFlags PlatformFlag
-        {
-            get { return GamePlatformFlags.BattleNet; }
-        }
-
-        public string Name { get; private set; }
-
-        public override string ToString()
-        {
-            return $"{PlatformFlag}, {Name}";
-        }
-
-        protected override object CloneInner()
-        {
-            return MemberwiseClone();
-        }
-
-        protected override bool InnerEquals(GameID other)
-        {
-            BattleNetGameID other1 = other as BattleNetGameID;
-            if (object.ReferenceEquals(other1, null)) return false;
-
-            return string.Equals(other1.Name, Name, StringComparison.OrdinalIgnoreCase);
-        }
-
-        protected override int InnerGetHashCode()
-        {
-            return Name != null ? Name.GetHashCode() : 0;
+            Metadata = metadata;
+            if (PlatformFlag != GamePlatformFlags.BattleNet)
+                throw new ArgumentException($"Platform should be {GamePlatformFlags.BattleNet}:{metadata:X}");
         }
     }
 }
